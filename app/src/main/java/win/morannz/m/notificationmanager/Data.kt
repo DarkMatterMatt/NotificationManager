@@ -54,10 +54,31 @@ data class RecentNotification (
     val text: String
 )
 
+// Packages that send notifications
+fun getPackagesWithNotifications(context: Context) : MutableList<String> {
+    val p = PreferenceManager.getDefaultSharedPreferences(context)
+    val packagesString = p.getString(C.PACKAGES_WITH_NOTIFICATIONS, null) ?: return mutableListOf()
+    return packagesString.split(",").toMutableList()
+}
+fun recordPackageWithNotifications(context: Context, packageName: String) {
+    if (packageName in C.PACKAGES_WITH_NOTIFICATIONS_EXCLUDE_LIST) {
+        return
+    }
+    val packages = getPackagesWithNotifications(context)
+    if (packageName in packages) {
+        return
+    }
+    val p = PreferenceManager.getDefaultSharedPreferences(context)
+    val e = p.edit()
+    packages.add(packageName)
+    e.putString(C.PACKAGES_WITH_NOTIFICATIONS, packages.joinToString(","))
+    e.apply()
+}
+
 // Notification Selectors
 fun getNotificationSelectors(context: Context) : MutableMap<Int, NotificationSelector> {
     val p = PreferenceManager.getDefaultSharedPreferences(context)
-    val nsString = p.getString(C.NOTIFICATION_SELECTOR, "{}")
+    val nsString = p.getString(C.NOTIFICATION_SELECTOR, null) ?: return mutableMapOf()
     val ns = Json.parse((IntSerializer to NotificationSelector.serializer()).map, nsString)
     return ns.toMutableMap()
 }
@@ -92,7 +113,7 @@ fun saveNotificationSelectorLastAlertTime(context: Context, id: Int, lastAlertTi
 // Alert Groups
 fun getAlertGroups(context: Context) : MutableMap<Int, AlertGroup> {
     val p = PreferenceManager.getDefaultSharedPreferences(context)
-    val agString = p.getString(C.ALERT_GROUP, "{}")
+    val agString = p.getString(C.ALERT_GROUP, null) ?: return mutableMapOf()
     val ag = Json.parse((IntSerializer to AlertGroup.serializer()).map, agString)
     return ag.toMutableMap()
 }
@@ -127,7 +148,7 @@ fun saveAlertGroupLastAlertTime(context: Context, id: Int, lastAlertTime: Long) 
 // Recent Notifications
 fun getRecentNotifications(context: Context) : MutableList<RecentNotification> {
     val p = PreferenceManager.getDefaultSharedPreferences(context)
-    val rnString = p.getString(C.RECENT_NOTIFICATION, "[]")
+    val rnString = p.getString(C.RECENT_NOTIFICATION, null) ?: return mutableListOf()
     val rn = Json.parse(RecentNotification.serializer().list, rnString)
     return rn.toMutableList()
 }

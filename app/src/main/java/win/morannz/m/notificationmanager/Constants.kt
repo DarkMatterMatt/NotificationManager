@@ -13,6 +13,8 @@ object C {
     const val RINGER_NORMAL   = 4
     const val NOTIFICATION_INTENT = "notificationIntent"
     const val NEW_NOTIFICATION_SELECTOR = "createNewNS"
+    const val PACKAGES_WITH_NOTIFICATIONS = "PN"
+    val PACKAGES_WITH_NOTIFICATIONS_EXCLUDE_LIST = listOf("android")
 }
 
 enum class FragmentId {

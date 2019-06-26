@@ -27,6 +27,7 @@ class NotificationManagerService : NotificationListenerService() {
         val recentNotifications = getRecentNotifications(this)
         recentNotifications.add(0, extractDataFromStatusBarNotification(sbn))
         saveRecentNotifications(this, recentNotifications.take(C.MAX_NUMBER_OF_RECENT_NOTIFICATIONS).toMutableList())
+        recordPackageWithNotifications(this, sbn.packageName)
 
         // find & play alert group
         val agId = matchNotificationSelector(sbn)?.alertGroupId ?: return

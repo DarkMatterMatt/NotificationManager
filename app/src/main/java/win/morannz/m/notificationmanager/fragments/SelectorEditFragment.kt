@@ -1,6 +1,7 @@
 package win.morannz.m.notificationmanager.fragments
 
 import android.content.Context
+import android.content.pm.PackageInfo
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -35,7 +36,8 @@ class SelectorEditFragment : Fragment() {
     private var ns: NotificationSelector = NotificationSelector()
     private var createNew: Boolean = false
     private var listener: OnFragmentInteractionListener? = null
-    private var alertGroups: Map<Int, AlertGroup> = mutableMapOf<Int, AlertGroup>()
+    private var alertGroups: Map<Int, AlertGroup> = mutableMapOf()
+    private var packages: MutableList<String> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,7 +47,10 @@ class SelectorEditFragment : Fragment() {
         if (nsString != null) {
             ns = Json.parse(NotificationSelector.serializer(), nsString)
         }
+
+        // load list of alert groups and packages
         alertGroups = getAlertGroups(activity!!.applicationContext)
+        packages = getPackagesWithNotifications(activity!!.applicationContext)
     }
 
     override fun onStart() {
@@ -62,12 +67,21 @@ class SelectorEditFragment : Fragment() {
             selector_edit_min_millisecs_between_alerts.setText(ns.minMillisecsBetweenAlerts.toString())
         }
 
-        val adapter = ArrayAdapter<String>(
+        // add options for alertGroup dropdown
+        val alertGroupAdapter = ArrayAdapter(
             activity!!.applicationContext,
             android.R.layout.simple_dropdown_item_1line,
             alertGroups.values.map{ x -> x.name }
         )
-        selector_edit_alert_group.setAdapter(adapter)
+        selector_edit_alert_group.setAdapter(alertGroupAdapter)
+
+        // add options for alertGroup dropdown
+        val packageNameAdapter = ArrayAdapter(
+            activity!!.applicationContext,
+            android.R.layout.simple_dropdown_item_1line,
+            packages
+        )
+        selector_edit_package_name.setAdapter(packageNameAdapter)
     }
 
     override fun onCreateView(
