@@ -6,13 +6,14 @@
     <string name="title_alerts_short">Alerts</string>
     <string name="title_recents">Recent Notifications</string>
     <string name="title_selectors">Notification Selectors</string>
+    <string name="title_selector_edit">Edit Selector</string>
     <string name="title_alerts">Alert Groups</string>
     <string name="title_activity_notification_manager">NotificationManager</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
 
-    <!-- Strings related to the Alert Dialog -->
+    <!-- Alert Dialog -->
     <string name="notification_listener_service">Notification Listener Service</string>
     <string name="notification_listener_service_explanation">For the app to work you need to enable the Notification
         Listener Service. Enable it now?
@@ -20,6 +21,12 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- Edit Selector -->
+    <string name="selector_edit_label_name">Name</string>
+    <string name="selector_edit_label_comment">Comment</string>
+    <string name="selector_edit_label_alert_group">Alert Group</string>
+    <string name="selector_edit_label_package_name">Application</string>
+    <string name="selector_edit_label_match_title">Match this title (regular expression)</string>
+    <string name="selector_edit_label_match_text">Match this text (regular expression)</string>
+    <string name="selector_edit_label_min_millisecs_between_alerts">Minimum milliseconds between alerts</string>
 </resources>

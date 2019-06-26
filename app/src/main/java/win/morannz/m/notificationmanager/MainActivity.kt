@@ -18,12 +18,15 @@ import win.morannz.m.notificationmanager.fragments.*
 
 
 class MainActivity : AppCompatActivity(),
-    SelectorsListFragment.OnListFragmentInteractionListener,
-    AlertsListFragment.OnListFragmentInteractionListener,
-    RecentsListFragment.OnListFragmentInteractionListener,
     SelectorsFragment.OnFragmentInteractionListener,
+    SelectorsListFragment.OnListFragmentInteractionListener,
+    SelectorEditFragment.OnFragmentInteractionListener,
     AlertsFragment.OnFragmentInteractionListener,
-    RecentsFragment.OnFragmentInteractionListener {
+    AlertsListFragment.OnListFragmentInteractionListener,
+    //AlertEditFragment.OnFragmentInteractionListener,
+    RecentsFragment.OnFragmentInteractionListener,
+    RecentsListFragment.OnListFragmentInteractionListener {
+    //RecentViewFragment.OnFragmentInteractionListener {
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener {
         navigate(
@@ -97,7 +100,7 @@ class MainActivity : AppCompatActivity(),
                 val b = Bundle()
                 val nsString = Json.stringify(NotificationSelector.serializer(), item as NotificationSelector)
                 b.putString(C.NOTIFICATION_SELECTOR, nsString)
-                navigate(FragmentId.RECENT_LIST_ITEM, b)
+                navigate(FragmentId.SELECTOR_EDIT, b)
             }
         }
     }
@@ -111,6 +114,7 @@ class MainActivity : AppCompatActivity(),
         val destFragment = when (destId) {
             FragmentId.RECENTS -> RecentsFragment()
             FragmentId.SELECTORS -> SelectorsFragment()
+            FragmentId.SELECTOR_EDIT -> SelectorEditFragment()
             FragmentId.ALERTS -> AlertsFragment()
             else -> return false
         }
@@ -118,6 +122,7 @@ class MainActivity : AppCompatActivity(),
         val destTitle = when (destId) {
             FragmentId.RECENTS -> R.string.title_recents
             FragmentId.SELECTORS -> R.string.title_selectors
+            FragmentId.SELECTOR_EDIT -> R.string.title_selector_edit
             FragmentId.ALERTS -> R.string.title_alerts
             else -> return false
         }

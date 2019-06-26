@@ -12,18 +12,22 @@ object C {
     const val RINGER_VIBRATE  = 2
     const val RINGER_NORMAL   = 4
     const val NOTIFICATION_INTENT = "notificationIntent"
+    const val NEW_NOTIFICATION_SELECTOR = "createNewNS"
 }
 
 enum class FragmentId {
     RECENTS,
     RECENT_LIST,
     RECENT_LIST_ITEM,
+    RECENT_VIEW,
     SELECTORS,
     SELECTOR_LIST,
     SELECTOR_LIST_ITEM,
+    SELECTOR_EDIT,
     ALERTS,
     ALERT_LIST,
     ALERT_LIST_ITEM,
+    ALERT_EDIT,
 }
 
 object RingerMode {
