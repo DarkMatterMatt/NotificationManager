@@ -94,12 +94,10 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onListFragmentInteraction(type: String, item: Any) {
-        Log.d(C.TAG, "onListFragmentInteraction($type, $item)")
         when (type) {
             C.NOTIFICATION_SELECTOR -> {
                 val b = Bundle()
-                val nsString = Json.stringify(NotificationSelector.serializer(), item as NotificationSelector)
-                b.putString(C.NOTIFICATION_SELECTOR, nsString)
+                b.putInt(C.NOTIFICATION_SELECTOR, item as Int)
                 navigate(FragmentId.SELECTOR_EDIT, b)
             }
         }

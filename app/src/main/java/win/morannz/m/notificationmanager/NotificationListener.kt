@@ -14,11 +14,6 @@ class NotificationManagerService : NotificationListenerService() {
     private var lastNotificationKey = ""
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
-        Log.d("NM3",
-            sbn.key + " ~ " +
-                    sbn.notification.extras.getString(Notification.EXTRA_TITLE) + " ~ " +
-                    sbn.notification.extras.getString(Notification.EXTRA_TEXT)
-        )
         // filter duplicate notifications
         if (sbn.key == lastNotificationKey) return
         lastNotificationKey = sbn.key
@@ -32,7 +27,6 @@ class NotificationManagerService : NotificationListenerService() {
         // find & play alert group
         val agId = matchNotificationSelector(sbn)?.alertGroupId ?: return
         val alertGroup = getAlertGroupById(agId) ?: return
-        Log.d("NM3", Json.stringify(AlertGroup.serializer(), alertGroup))
         playAlertGroup(alertGroup)
     }
 

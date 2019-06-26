@@ -27,10 +27,9 @@ class SelectorListRecyclerViewAdapter(
 
     init {
         mOnClickListener = View.OnClickListener { v ->
-            val item = v.tag as NotificationSelector
             // Notify the active callbacks interface (the activity, if the fragment is attached to
             // one) that an item has been selected.
-            mListener?.onListFragmentInteraction(C.NOTIFICATION_SELECTOR, item)
+            mListener?.onListFragmentInteraction(C.NOTIFICATION_SELECTOR, v.tag)
         }
     }
 
@@ -46,7 +45,7 @@ class SelectorListRecyclerViewAdapter(
         holder.mContentView.text = "#NAME: " + item.name
 
         with(holder.mView) {
-            tag = item
+            tag = id
             setOnClickListener(mOnClickListener)
         }
     }

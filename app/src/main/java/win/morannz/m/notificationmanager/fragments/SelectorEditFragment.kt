@@ -1,20 +1,18 @@
 package win.morannz.m.notificationmanager.fragments
 
 import android.content.Context
-import android.content.pm.PackageInfo
-import android.net.Uri
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.EditText
+import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_selector_edit.*
 import kotlinx.serialization.json.Json
 import win.morannz.m.notificationmanager.*
-import android.widget.AutoCompleteTextView
-import android.widget.ArrayAdapter
-
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -33,24 +31,43 @@ private const val ARG_PARAM2 = "param2"
  */
 class SelectorEditFragment : Fragment() {
     // TODO: Rename and change types of parameters
+    private var nsId: Int = -1
     private var ns: NotificationSelector = NotificationSelector()
     private var createNew: Boolean = false
     private var listener: OnFragmentInteractionListener? = null
-    private var alertGroups: Map<Int, AlertGroup> = mutableMapOf()
+    private var alertGroups: MutableMap<Int, AlertGroup> = mutableMapOf()
+    private var alertGroupsNameLookup: MutableMap<String, Int> = mutableMapOf()
+    private var notificationSelectors: MutableMap<Int, NotificationSelector> = mutableMapOf()
     private var packages: MutableList<String> = mutableListOf()
+
+    fun EditText.saveAfterTextChanged(afterTextChanged: (String) -> Unit) {
+        this.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+            override fun afterTextChanged(editable: Editable?) {
+                afterTextChanged.invoke(editable.toString())
+                notificationSelectors[nsId] = ns
+                saveNotificationSelectors(activity!!.applicationContext, notificationSelectors)
+            }
+        })
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         createNew = arguments?.getBoolean(C.NEW_NOTIFICATION_SELECTOR) ?: false
-        val nsString = arguments?.getString(C.NOTIFICATION_SELECTOR)
-        if (nsString != null) {
-            ns = Json.parse(NotificationSelector.serializer(), nsString)
-        }
+        nsId = arguments?.getInt(C.NOTIFICATION_SELECTOR, -1) ?: -1
 
-        // load list of alert groups and packages
-        alertGroups = getAlertGroups(activity!!.applicationContext)
+        // load list of notification selectors and packages
+        notificationSelectors = getNotificationSelectors(activity!!.applicationContext)
+        ns = notificationSelectors[nsId] ?: NotificationSelector()
         packages = getPackagesWithNotifications(activity!!.applicationContext)
+
+        // load alert groups, create lookup map
+        alertGroups = getAlertGroups(activity!!.applicationContext)
+        for ((id, ag) in alertGroups) {
+            alertGroupsNameLookup[ag.name] = id
+        }
     }
 
     override fun onStart() {
@@ -71,7 +88,7 @@ class SelectorEditFragment : Fragment() {
         val alertGroupAdapter = ArrayAdapter(
             activity!!.applicationContext,
             android.R.layout.simple_dropdown_item_1line,
-            alertGroups.values.map{ x -> x.name }
+            alertGroups.values.map { x -> x.name }
         )
         selector_edit_alert_group.setAdapter(alertGroupAdapter)
 
@@ -82,6 +99,15 @@ class SelectorEditFragment : Fragment() {
             packages
         )
         selector_edit_package_name.setAdapter(packageNameAdapter)
+
+        // add textWatchers
+        selector_edit_name.saveAfterTextChanged { ns.name = it }
+        selector_edit_comment.saveAfterTextChanged { ns.comment = it }
+        selector_edit_alert_group.saveAfterTextChanged { ns.alertGroupId = alertGroupsNameLookup[it] }
+        selector_edit_package_name.saveAfterTextChanged { ns.packageName = it }
+        selector_edit_match_title.saveAfterTextChanged { ns.matchTitle = it }
+        selector_edit_match_text.saveAfterTextChanged { ns.matchText = it }
+        selector_edit_min_millisecs_between_alerts.saveAfterTextChanged { ns.minMillisecsBetweenAlerts = it.toInt() }
     }
 
     override fun onCreateView(
