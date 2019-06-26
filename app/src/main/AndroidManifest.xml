@@ -20,7 +20,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <service android:name="win.morannz.m.notificationmanager.NotificationManager3Service"
+        <service android:name="win.morannz.m.notificationmanager.NotificationManagerService"
                  android:label="@string/service_name"
                  android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
             <intent-filter>

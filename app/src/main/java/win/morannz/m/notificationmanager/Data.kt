@@ -46,6 +46,14 @@ data class AlertGroup (
     var disabled: Boolean = false
 )
 
+@Serializable
+data class RecentNotification (
+    val packageName: String,
+    val time: Long,
+    val title: String,
+    val text: String
+)
+
 // Notification Selectors
 fun getNotificationSelectors(context: Context) : MutableMap<Int, NotificationSelector> {
     val p = PreferenceManager.getDefaultSharedPreferences(context)
@@ -117,13 +125,6 @@ fun saveAlertGroupLastAlertTime(context: Context, id: Int, lastAlertTime: Long) 
 }
 
 // Recent Notifications
-@Serializable
-data class RecentNotification (
-    val packageName: String,
-    val time: Long,
-    val title: String,
-    val text: String
-)
 fun getRecentNotifications(context: Context) : MutableList<RecentNotification> {
     val p = PreferenceManager.getDefaultSharedPreferences(context)
     val rnString = p.getString(C.RECENT_NOTIFICATION, "[]")

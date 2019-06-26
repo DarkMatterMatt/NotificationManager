@@ -1,13 +1,13 @@
 <resources>
-    <string name="app_name">NotificationManager3</string>
-    <string name="service_name">NotificationManager3 Listener</string>
+    <string name="app_name">NotificationManager</string>
+    <string name="service_name">NotificationManager Listener</string>
     <string name="title_recents_short">Recent</string>
     <string name="title_selectors_short">Selectors</string>
     <string name="title_alerts_short">Alerts</string>
     <string name="title_recents">Recent Notifications</string>
     <string name="title_selectors">Notification Selectors</string>
     <string name="title_alerts">Alert Groups</string>
-    <string name="title_activity_notification_manager3">NotificationManager3</string>
+    <string name="title_activity_notification_manager">NotificationManager</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>

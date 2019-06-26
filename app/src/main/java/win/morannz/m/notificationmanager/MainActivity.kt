@@ -1,18 +1,20 @@
 package win.morannz.m.notificationmanager
 
 import android.app.AlertDialog
-import android.content.*
+import android.content.ComponentName
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import androidx.appcompat.app.AppCompatActivity
-import android.text.TextUtils
-import kotlinx.android.synthetic.main.activity_main.*
-import win.morannz.m.notificationmanager.fragments.*
-import android.content.pm.PackageManager
-import android.content.ComponentName
-import android.os.Build
 import android.service.notification.NotificationListenerService.requestRebind
+import android.text.TextUtils
+import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.serialization.json.Json
+import win.morannz.m.notificationmanager.fragments.*
 
 
 class MainActivity : AppCompatActivity(),
@@ -23,28 +25,44 @@ class MainActivity : AppCompatActivity(),
     AlertsFragment.OnFragmentInteractionListener,
     RecentsFragment.OnFragmentInteractionListener {
 
-    private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { navigate(it.itemId) }
+    private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener {
+        navigate(
+            when (it.itemId) {
+                R.id.navigation_recents -> FragmentId.RECENTS
+                R.id.navigation_selectors -> FragmentId.SELECTORS
+                R.id.navigation_alerts -> FragmentId.ALERTS
+                else -> return@OnNavigationItemSelectedListener false
+            }
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
-        navigate(R.id.navigation_recents)
+        navigate(FragmentId.RECENTS)
 
         // prompt user to enable the notification listener service
         if (!isNotificationServiceEnabled()) {
             buildNotificationServiceAlertDialog().show()
         }
 
-        // TODO: Remove this
         // Alert Groups
         val alertGroups = mutableMapOf<Int, AlertGroup>() //getAlertGroups(this)
         var agMaxIndex = -1 //getAlertGroupMaxIndex(this)
         for (i in 0..19) {
-            alertGroups.put(++agMaxIndex, AlertGroup(
-                name = "Alert Group " + i,
-                vibrationPattern = longArrayOf(0, i*100L, 2000 - i*100L, i*100L, 2000 - i*100L).joinToString(",")
-            ))
+            alertGroups.put(
+                ++agMaxIndex, AlertGroup(
+                    name = "Alert Group $i",
+                    vibrationPattern = longArrayOf(
+                        0,
+                        i * 100L,
+                        2000 - i * 100L,
+                        i * 100L,
+                        2000 - i * 100L
+                    ).joinToString(",")
+                )
+            )
         }
         saveAlertGroupMaxIndex(this, agMaxIndex)
         saveAlertGroups(this, alertGroups)
@@ -53,12 +71,14 @@ class MainActivity : AppCompatActivity(),
         val notificationSelectors = mutableMapOf<Int, NotificationSelector>() //getNotificationSelectors(this)
         var nsMaxIndex = -1 //getNotificationSelectorMaxIndex(this)
         for (i in 0..19) {
-            notificationSelectors.put(++nsMaxIndex, NotificationSelector(
-                alertGroupId = i,
-                name = "Pushbullet NS " + i,
-                packageName = "com.pushbullet.android",
-                matchText = """yeet """ + i
-            ))
+            notificationSelectors.put(
+                ++nsMaxIndex, NotificationSelector(
+                    alertGroupId = i,
+                    name = "Pushbullet NS $i",
+                    packageName = "com.pushbullet.android",
+                    matchText = """yeet $i"""
+                )
+            )
         }
         saveNotificationSelectorMaxIndex(this, nsMaxIndex)
         saveNotificationSelectors(this, notificationSelectors)
@@ -71,33 +91,41 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onListFragmentInteraction(type: String, item: Any) {
-
+        Log.d(C.TAG, "onListFragmentInteraction($type, $item)")
+        when (type) {
+            C.NOTIFICATION_SELECTOR -> {
+                val b = Bundle()
+                val nsString = Json.stringify(NotificationSelector.serializer(), item as NotificationSelector)
+                b.putString(C.NOTIFICATION_SELECTOR, nsString)
+                navigate(FragmentId.RECENT_LIST_ITEM, b)
+            }
+        }
     }
 
     override fun onFragmentInteraction(type: String, data: Any) {
 
     }
 
-    fun navigate(destId: Int, bundle: Bundle? = null) : Boolean {
+    fun navigate(destId: FragmentId, bundle: Bundle? = null): Boolean {
         // get destination fragment
         val destFragment = when (destId) {
-            R.id.navigation_recents -> RecentsFragment()
-            R.id.navigation_selectors -> SelectorsFragment()
-            R.id.navigation_alerts -> AlertsFragment()
+            FragmentId.RECENTS -> RecentsFragment()
+            FragmentId.SELECTORS -> SelectorsFragment()
+            FragmentId.ALERTS -> AlertsFragment()
             else -> return false
         }
         // get destination title
         val destTitle = when (destId) {
-            R.id.navigation_recents -> R.string.title_recents
-            R.id.navigation_selectors -> R.string.title_selectors
-            R.id.navigation_alerts -> R.string.title_alerts
+            FragmentId.RECENTS -> R.string.title_recents
+            FragmentId.SELECTORS -> R.string.title_selectors
+            FragmentId.ALERTS -> R.string.title_alerts
             else -> return false
         }
         // check whether to support the "back button"
         val addToBackStack = when (destId) {
-            R.id.navigation_recents,
-            R.id.navigation_selectors,
-            R.id.navigation_alerts -> false
+            FragmentId.RECENTS,
+            FragmentId.SELECTORS,
+            FragmentId.ALERTS -> false
             else -> true
         }
 
@@ -113,17 +141,25 @@ class MainActivity : AppCompatActivity(),
         t.commit()
 
         // change the title
-        toolbar.setTitle(destTitle)
+        setTitle(destTitle)
         return true
     }
 
     fun restartNotificationService() {
         // get component name
-        val cn = ComponentName(this, NotificationManager3Service::class.java)
+        val cn = ComponentName(this, NotificationManagerService::class.java)
 
         // toggle disable/enable
-        packageManager.setComponentEnabledSetting(cn, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP)
-        packageManager.setComponentEnabledSetting(cn, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP)
+        packageManager.setComponentEnabledSetting(
+            cn,
+            PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+            PackageManager.DONT_KILL_APP
+        )
+        packageManager.setComponentEnabledSetting(
+            cn,
+            PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+            PackageManager.DONT_KILL_APP
+        )
 
         // request rebind
         if (Build.VERSION.SDK_INT >= 24) {
@@ -137,7 +173,7 @@ class MainActivity : AppCompatActivity(),
      * Got it from: https://github.com/kpbird/NotificationListenerService-Example/blob/master/NLSExample/src/main/java/com/kpbird/nlsexample/NLService.java
      * @return True if enabled, false otherwise.
      */
-    private fun isNotificationServiceEnabled() : Boolean {
+    private fun isNotificationServiceEnabled(): Boolean {
         // loop through all packages that have enabled notification listeners and check if we're there
         val pkgName = packageName
         val flat = Settings.Secure.getString(contentResolver, "enabled_notification_listeners")

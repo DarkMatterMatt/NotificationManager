@@ -10,7 +10,7 @@ import android.service.notification.StatusBarNotification
 import android.util.Log
 import kotlinx.serialization.json.Json
 
-class NotificationManager3Service : NotificationListenerService() {
+class NotificationManagerService : NotificationListenerService() {
     private var lastNotificationKey = ""
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
