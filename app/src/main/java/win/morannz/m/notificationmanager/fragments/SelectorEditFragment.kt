@@ -4,21 +4,14 @@ import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import androidx.fragment.app.Fragment
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_selector_edit.*
 import kotlinx.serialization.json.Json
 import win.morannz.m.notificationmanager.*
-
-
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
 /**
  * A simple [Fragment] subclass.
@@ -33,21 +26,25 @@ class SelectorEditFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var nsId: Int = -1
     private var ns: NotificationSelector = NotificationSelector()
+    private var nsBackup: NotificationSelector = NotificationSelector()
     private var createNew: Boolean = false
     private var listener: OnFragmentInteractionListener? = null
     private var alertGroups: MutableMap<Int, AlertGroup> = mutableMapOf()
     private var alertGroupsNameLookup: MutableMap<String, Int> = mutableMapOf()
     private var notificationSelectors: MutableMap<Int, NotificationSelector> = mutableMapOf()
     private var packages: MutableList<String> = mutableListOf()
+    private var textWatchersEnabled: Boolean = true
 
-    fun EditText.saveAfterTextChanged(afterTextChanged: (String) -> Unit) {
+    private fun EditText.saveAfterTextChanged(afterTextChanged: (String) -> Unit) {
         this.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun afterTextChanged(editable: Editable?) {
-                afterTextChanged.invoke(editable.toString())
-                notificationSelectors[nsId] = ns
-                saveNotificationSelectors(activity!!.applicationContext, notificationSelectors)
+                if (textWatchersEnabled) {
+                    afterTextChanged.invoke(editable.toString())
+                    notificationSelectors[nsId] = ns
+                    saveNotificationSelectors(activity!!.applicationContext, notificationSelectors)
+                }
             }
         })
     }
@@ -63,11 +60,38 @@ class SelectorEditFragment : Fragment() {
         ns = notificationSelectors[nsId] ?: NotificationSelector()
         packages = getPackagesWithNotifications(activity!!.applicationContext)
 
+        // deep copy the notificationSelector
+        nsBackup = Json.parse(NotificationSelector.serializer(), Json.stringify(NotificationSelector.serializer(), ns))
+
         // load alert groups, create lookup map
         alertGroups = getAlertGroups(activity!!.applicationContext)
         for ((id, ag) in alertGroups) {
             alertGroupsNameLookup[ag.name] = id
         }
+
+        setHasOptionsMenu(true)
+    }
+
+    private fun registerTextWatchers() {
+        selector_edit_name.saveAfterTextChanged { ns.name = it }
+        selector_edit_comment.saveAfterTextChanged { ns.comment = it }
+        selector_edit_alert_group.saveAfterTextChanged { ns.alertGroupId = alertGroupsNameLookup[it] }
+        selector_edit_package_name.saveAfterTextChanged { ns.packageName = it }
+        selector_edit_match_title.saveAfterTextChanged { ns.matchTitle = it }
+        selector_edit_match_text.saveAfterTextChanged { ns.matchText = it }
+        selector_edit_min_millisecs_between_alerts.saveAfterTextChanged { ns.minMillisecsBetweenAlerts = it.toInt() }
+    }
+
+    private fun populateFields(ns: NotificationSelector) {
+        textWatchersEnabled = false
+        selector_edit_name.setText(ns.name)
+        selector_edit_comment.setText(ns.comment)
+        selector_edit_alert_group.setText(alertGroups[ns.alertGroupId]?.name)
+        selector_edit_package_name.setText(ns.packageName)
+        selector_edit_match_title.setText(ns.matchTitle)
+        selector_edit_match_text.setText(ns.matchText)
+        selector_edit_min_millisecs_between_alerts.setText(ns.minMillisecsBetweenAlerts.toString())
+        textWatchersEnabled = true
     }
 
     override fun onStart() {
@@ -75,13 +99,7 @@ class SelectorEditFragment : Fragment() {
 
         // populate existing data
         if (!createNew) {
-            selector_edit_name.setText(ns.name)
-            selector_edit_comment.setText(ns.comment)
-            selector_edit_alert_group.setText(alertGroups[ns.alertGroupId]?.name)
-            selector_edit_package_name.setText(ns.packageName)
-            selector_edit_match_title.setText(ns.matchTitle)
-            selector_edit_match_text.setText(ns.matchText)
-            selector_edit_min_millisecs_between_alerts.setText(ns.minMillisecsBetweenAlerts.toString())
+            populateFields(ns)
         }
 
         // add options for alertGroup dropdown
@@ -101,13 +119,7 @@ class SelectorEditFragment : Fragment() {
         selector_edit_package_name.setAdapter(packageNameAdapter)
 
         // add textWatchers
-        selector_edit_name.saveAfterTextChanged { ns.name = it }
-        selector_edit_comment.saveAfterTextChanged { ns.comment = it }
-        selector_edit_alert_group.saveAfterTextChanged { ns.alertGroupId = alertGroupsNameLookup[it] }
-        selector_edit_package_name.saveAfterTextChanged { ns.packageName = it }
-        selector_edit_match_title.saveAfterTextChanged { ns.matchTitle = it }
-        selector_edit_match_text.saveAfterTextChanged { ns.matchText = it }
-        selector_edit_min_millisecs_between_alerts.saveAfterTextChanged { ns.minMillisecsBetweenAlerts = it.toInt() }
+        registerTextWatchers()
     }
 
     override fun onCreateView(
@@ -130,6 +142,36 @@ class SelectorEditFragment : Fragment() {
     override fun onDetach() {
         super.onDetach()
         listener = null
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        // TODO Auto-generated method stub
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.selector_edit, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // handle item selection
+        when (item.itemId) {
+            R.id.action_selector_edit_cancel_edit -> return cancelEdit()
+            R.id.action_selector_edit_delete -> return deleteSelector()
+            else -> return super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun cancelEdit(): Boolean {
+        populateFields(nsBackup)
+        ns = Json.parse(NotificationSelector.serializer(), Json.stringify(NotificationSelector.serializer(), nsBackup))
+        notificationSelectors[nsId] = ns
+        saveNotificationSelectors(activity!!.applicationContext, notificationSelectors)
+        return true
+    }
+
+    private fun deleteSelector(): Boolean {
+        notificationSelectors.remove(nsId)
+        saveNotificationSelectors(activity!!.applicationContext, notificationSelectors)
+        getActivity()?.onBackPressed()
+        return true
     }
 
     /**

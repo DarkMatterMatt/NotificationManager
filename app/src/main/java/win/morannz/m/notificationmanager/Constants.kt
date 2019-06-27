@@ -18,6 +18,7 @@ object C {
 }
 
 enum class FragmentId {
+    SETTINGS,
     RECENTS,
     RECENT_LIST,
     RECENT_LIST_ITEM,

@@ -13,6 +13,9 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
 
+    <!-- Settings -->
+    <string name="action_settings">Settings</string>
+
     <!-- Alert Dialog -->
     <string name="notification_listener_service">Notification Listener Service</string>
     <string name="notification_listener_service_explanation">For the app to work you need to enable the Notification
@@ -29,4 +32,6 @@
     <string name="selector_edit_label_match_title">Match this title (regular expression)</string>
     <string name="selector_edit_label_match_text">Match this text (regular expression)</string>
     <string name="selector_edit_label_min_millisecs_between_alerts">Minimum milliseconds between alerts</string>
+    <string name="selector_edit_cancel_edit">Cancel edits</string>
+    <string name="selector_edit_delete">Delete</string>
 </resources>

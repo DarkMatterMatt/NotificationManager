@@ -10,11 +10,13 @@ import android.provider.Settings
 import android.service.notification.NotificationListenerService.requestRebind
 import android.text.TextUtils
 import android.util.Log
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.serialization.json.Json
 import win.morannz.m.notificationmanager.fragments.*
+import android.view.Menu
 
 
 class MainActivity : AppCompatActivity(),
@@ -39,9 +41,27 @@ class MainActivity : AppCompatActivity(),
         )
     }
 
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+        R.id.action_settings -> {
+            navigate(FragmentId.SETTINGS)
+        }
+        else -> {
+            // If we got here, the user's action was not recognized.
+            // Invoke the superclass to handle it.
+            super.onOptionsItemSelected(item)
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        menuInflater.inflate(R.menu.toolbar, menu)
+        return true
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        setSupportActionBar(toolbar)
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
         navigate(FragmentId.RECENTS)
 
