@@ -9,9 +9,6 @@ object C {
     const val ALERT_GROUP           = "AG"
     const val MAX_INDEX       = "maxIndex"
     const val LAST_ALERT_TIME = "lastAlertTime"
-    const val RINGER_SILENT   = 1
-    const val RINGER_VIBRATE  = 2
-    const val RINGER_NORMAL   = 4
     const val NOTIFICATION_INTENT = "notificationIntent"
     const val NEW_NOTIFICATION_SELECTOR = "createNewNS"
     const val PACKAGES_WITH_NOTIFICATIONS = "PN"

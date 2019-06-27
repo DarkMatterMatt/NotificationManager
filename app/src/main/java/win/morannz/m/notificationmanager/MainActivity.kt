@@ -1,6 +1,5 @@
 package win.morannz.m.notificationmanager
 
-import android.app.AlertDialog
 import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -9,14 +8,14 @@ import android.os.Bundle
 import android.provider.Settings
 import android.service.notification.NotificationListenerService.requestRebind
 import android.text.TextUtils
-import android.util.Log
+import android.view.Menu
 import android.view.MenuItem
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.serialization.json.Json
 import win.morannz.m.notificationmanager.fragments.*
-import android.view.Menu
 
 
 class MainActivity : AppCompatActivity(),
@@ -67,7 +66,7 @@ class MainActivity : AppCompatActivity(),
 
         // prompt user to enable the notification listener service
         if (!isNotificationServiceEnabled()) {
-            buildNotificationServiceAlertDialog().show()
+            showNotificationServiceAlertDialog()
         }
 
         // Alert Groups
@@ -228,16 +227,16 @@ class MainActivity : AppCompatActivity(),
      * the Notification Listener Service on yet.
      * @return An alert dialog which leads to the notification enabling screen
      */
-    private fun buildNotificationServiceAlertDialog(): AlertDialog {
-        val alertDialogBuilder = AlertDialog.Builder(this)
-        alertDialogBuilder.setTitle(R.string.notification_listener_service)
-        alertDialogBuilder.setMessage(R.string.notification_listener_service_explanation)
-        alertDialogBuilder.setPositiveButton(R.string.yes) { dialog, id -> startActivity(Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS")) }
-        alertDialogBuilder.setNegativeButton(R.string.no) { dialog, id ->
-            // If you choose to not enable the notification listener
-            // the app. will not work as expected
-        }
-        return alertDialogBuilder.create()
+    private fun showNotificationServiceAlertDialog() {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.notification_listener_service)
+            .setMessage(R.string.notification_listener_service_explanation)
+            .setPositiveButton(R.string.yes) { dialog, id -> startActivity(Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS")) }
+            .setNegativeButton(R.string.no) { dialog, id ->
+                // If you choose to not enable the notification listener
+                // the app. will not work as expected
+            }
+            .show()
     }
 
     /*private fun notificationListenerServiceIsRunning(): Boolean {
