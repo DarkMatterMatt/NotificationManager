@@ -1,6 +1,7 @@
 package win.morannz.m.notificationmanager
 
 object C {
+    const val NO_DATA = 0
     const val TAG = "NM3"
     const val MAX_NUMBER_OF_RECENT_NOTIFICATIONS = 10
     const val RECENT_NOTIFICATION   = "RN"

@@ -114,17 +114,27 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onListFragmentInteraction(type: String, item: Any) {
-        when (type) {
-            C.NOTIFICATION_SELECTOR -> {
-                val b = Bundle()
-                b.putInt(C.NOTIFICATION_SELECTOR, item as Int)
-                navigate(FragmentId.SELECTOR_EDIT, b)
-            }
-        }
+        // onFragmentInteraction handles everything
+        onFragmentInteraction(type, item)
     }
 
     override fun onFragmentInteraction(type: String, data: Any) {
+        when (type) {
+            C.NEW_NOTIFICATION_SELECTOR -> {
+                var maxIndex = getNotificationSelectorMaxIndex(this)
+                saveNotificationSelectorMaxIndex(this, ++maxIndex)
 
+                val b = Bundle()
+                b.putBoolean(C.NEW_NOTIFICATION_SELECTOR, true)
+                b.putInt(C.NOTIFICATION_SELECTOR, maxIndex)
+                navigate(FragmentId.SELECTOR_EDIT, b)
+            }
+            C.NOTIFICATION_SELECTOR -> {
+                val b = Bundle()
+                b.putInt(C.NOTIFICATION_SELECTOR, data as Int)
+                navigate(FragmentId.SELECTOR_EDIT, b)
+            }
+        }
     }
 
     fun navigate(destId: FragmentId, bundle: Bundle? = null): Boolean {

@@ -47,8 +47,8 @@ class RecentListRecyclerViewAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mValues[position]
 
-        holder.mTitleView.text = item.title
-        holder.mTextView.text = item.text
+        holder.mTitleView.text = if (item.title != "") item.title else "<title is empty>"
+        holder.mTextView.text = if (item.text != "") item.text else "<text is empty>"
 
         // set datetime field
         val sdf = SimpleDateFormat.getDateTimeInstance()
@@ -59,7 +59,7 @@ class RecentListRecyclerViewAdapter(
             val icon = holder.mPackageIconView.context.packageManager.getApplicationIcon(item.packageName)
             holder.mPackageIconView.setImageDrawable(icon)
         } catch (e: PackageManager.NameNotFoundException) {
-            Log.e("NM3", "Caught PackageManager.NameNotFoundException for " + item.packageName)
+            Log.e(C.TAG, "Caught PackageManager.NameNotFoundException for " + item.packageName)
         }
 
         with (holder.mView) {

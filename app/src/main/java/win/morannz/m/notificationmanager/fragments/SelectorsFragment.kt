@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import kotlinx.android.synthetic.main.fragment_selectors.*
 import win.morannz.m.notificationmanager.C
 import win.morannz.m.notificationmanager.R
 
@@ -46,9 +47,11 @@ class SelectorsFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_selectors, container, false)
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    fun onButtonPressed() {
-        listener?.onFragmentInteraction(C.NOTIFICATION_SELECTOR, "")
+    override fun onStart() {
+        super.onStart()
+        btn_add_selector.setOnClickListener {
+            listener?.onFragmentInteraction(C.NEW_NOTIFICATION_SELECTOR, C.NO_DATA)
+        }
     }
 
     override fun onAttach(context: Context) {
