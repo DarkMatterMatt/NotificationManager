@@ -8,6 +8,7 @@
     <string name="title_selectors">Notification Selectors</string>
     <string name="title_selector_edit">Edit Selector</string>
     <string name="title_alerts">Alert Groups</string>
+    <string name="title_alert_edit">Edit Group</string>
     <string name="title_activity_notification_manager">NotificationManager</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
@@ -34,4 +35,15 @@
     <string name="selector_edit_label_min_millisecs_between_alerts">Minimum milliseconds between alerts</string>
     <string name="selector_edit_cancel_edit">Cancel edits</string>
     <string name="selector_edit_delete">Delete</string>
+
+    <!-- Edit Alert -->
+    <string name="alert_edit_label_name">Name</string>
+    <string name="alert_edit_label_comment">Comment</string>
+    <string name="alert_edit_label_min_millisecs_between_alerts">Minimum milliseconds between alerts</string>
+    <string name="alert_edit_cancel_edit">Cancel edits</string>
+    <string name="alert_edit_delete">Delete</string>
+    <string name="alert_edit_sound_uri">Ringtone / notification sound</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

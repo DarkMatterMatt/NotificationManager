@@ -26,10 +26,9 @@ class AlertListRecyclerViewAdapter(
 
     init {
         mOnClickListener = View.OnClickListener { v ->
-            val item = v.tag as AlertGroup
             // Notify the active callbacks interface (the activity, if the fragment is attached to
             // one) that an item has been selected.
-            mListener?.onListFragmentInteraction(C.ALERT_GROUP, item)
+            mListener?.onListFragmentInteraction(C.ALERT_GROUP, v.tag)
         }
     }
 
@@ -45,7 +44,7 @@ class AlertListRecyclerViewAdapter(
         holder.mContentView.text = "#NAME: ${C.ALERT_GROUP} ${item.name}"
 
         with (holder.mView) {
-            tag = item
+            tag = id
             setOnClickListener(mOnClickListener)
         }
     }

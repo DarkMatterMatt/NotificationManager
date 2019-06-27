@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity(),
     SelectorEditFragment.OnFragmentInteractionListener,
     AlertsFragment.OnFragmentInteractionListener,
     AlertsListFragment.OnListFragmentInteractionListener,
-    //AlertEditFragment.OnFragmentInteractionListener,
+    AlertEditFragment.OnFragmentInteractionListener,
     RecentsFragment.OnFragmentInteractionListener,
     RecentsListFragment.OnListFragmentInteractionListener {
     //RecentViewFragment.OnFragmentInteractionListener {
@@ -133,6 +133,11 @@ class MainActivity : AppCompatActivity(),
                 b.putInt(C.NOTIFICATION_SELECTOR, data as Int)
                 navigate(FragmentId.SELECTOR_EDIT, b)
             }
+            C.ALERT_GROUP -> {
+                val b = Bundle()
+                b.putInt(C.ALERT_GROUP, data as Int)
+                navigate(FragmentId.ALERT_EDIT, b)
+            }
         }
     }
 
@@ -143,6 +148,7 @@ class MainActivity : AppCompatActivity(),
             FragmentId.SELECTORS -> SelectorsFragment()
             FragmentId.SELECTOR_EDIT -> SelectorEditFragment()
             FragmentId.ALERTS -> AlertsFragment()
+            FragmentId.ALERT_EDIT -> AlertEditFragment()
             else -> return false
         }
         // get destination title
@@ -151,6 +157,7 @@ class MainActivity : AppCompatActivity(),
             FragmentId.SELECTORS -> R.string.title_selectors
             FragmentId.SELECTOR_EDIT -> R.string.title_selector_edit
             FragmentId.ALERTS -> R.string.title_alerts
+            FragmentId.ALERT_EDIT -> R.string.title_alert_edit
             else -> return false
         }
         // check whether to support the "back button"

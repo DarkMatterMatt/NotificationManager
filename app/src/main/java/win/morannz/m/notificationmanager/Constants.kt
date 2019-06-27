@@ -10,9 +10,14 @@ object C {
     const val MAX_INDEX       = "maxIndex"
     const val LAST_ALERT_TIME = "lastAlertTime"
     const val NOTIFICATION_INTENT = "notificationIntent"
-    const val NEW_NOTIFICATION_SELECTOR = "createNewNS"
+    const val NEW_NOTIFICATION_SELECTOR = "createNew$NOTIFICATION_SELECTOR"
+    const val NEW_ALERT_GROUP = "createNew$ALERT_GROUP"
     const val PACKAGES_WITH_NOTIFICATIONS = "PN"
     val PACKAGES_WITH_NOTIFICATIONS_EXCLUDE_LIST = listOf("android")
+}
+
+object RequestCode {
+    const val SOUND_URI = 1
 }
 
 enum class FragmentId {
