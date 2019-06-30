@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity(),
             showNotificationServiceAlertDialog()
         }
 
-        // Alert Groups
+        /*// Alert Groups
         val alertGroups = mutableMapOf<Int, AlertGroup>() //getAlertGroups(this)
         var agMaxIndex = -1 //getAlertGroupMaxIndex(this)
         for (i in 0..19) {
@@ -103,7 +103,7 @@ class MainActivity : AppCompatActivity(),
             )
         }
         saveNotificationSelectorMaxIndex(this, nsMaxIndex)
-        saveNotificationSelectors(this, notificationSelectors)
+        saveNotificationSelectors(this, notificationSelectors)*/
 
         restartNotificationService()
     }
@@ -132,6 +132,15 @@ class MainActivity : AppCompatActivity(),
                 val b = Bundle()
                 b.putInt(C.NOTIFICATION_SELECTOR, data as Int)
                 navigate(FragmentId.SELECTOR_EDIT, b)
+            }
+            C.NEW_ALERT_GROUP -> {
+                var maxIndex = getAlertGroupMaxIndex(this)
+                saveAlertGroupMaxIndex(this, ++maxIndex)
+
+                val b = Bundle()
+                b.putBoolean(C.NEW_NOTIFICATION_SELECTOR, true)
+                b.putInt(C.ALERT_GROUP, maxIndex)
+                navigate(FragmentId.ALERT_EDIT, b)
             }
             C.ALERT_GROUP -> {
                 val b = Bundle()
@@ -184,25 +193,25 @@ class MainActivity : AppCompatActivity(),
         return true
     }
 
-    fun restartNotificationService() {
+    private fun restartNotificationService() {
         // get component name
-        val cn = ComponentName(this, NotificationManagerService::class.java)
+        val componentName = ComponentName(this, NotificationManagerService::class.java)
 
         // toggle disable/enable
         packageManager.setComponentEnabledSetting(
-            cn,
+            componentName,
             PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
             PackageManager.DONT_KILL_APP
         )
         packageManager.setComponentEnabledSetting(
-            cn,
+            componentName,
             PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
             PackageManager.DONT_KILL_APP
         )
 
         // request rebind
         if (Build.VERSION.SDK_INT >= 24) {
-            requestRebind(cn)
+            requestRebind(componentName)
         }
     }
 
@@ -238,7 +247,7 @@ class MainActivity : AppCompatActivity(),
         MaterialAlertDialogBuilder(this)
             .setTitle(R.string.notification_listener_service)
             .setMessage(R.string.notification_listener_service_explanation)
-            .setPositiveButton(R.string.yes) { dialog, id -> startActivity(Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS")) }
+            .setPositiveButton(R.string.yes) { _, _ -> startActivity(Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS")) }
             .setNegativeButton(R.string.no) { dialog, id ->
                 // If you choose to not enable the notification listener
                 // the app. will not work as expected

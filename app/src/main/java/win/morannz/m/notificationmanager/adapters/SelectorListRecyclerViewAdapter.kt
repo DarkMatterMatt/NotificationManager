@@ -20,7 +20,7 @@ import win.morannz.m.notificationmanager.fragments.SelectorsListFragment
  */
 class SelectorListRecyclerViewAdapter(
     private val mValues: List<Pair<Int, NotificationSelector>>,
-    private val mListener: SelectorsListFragment.OnListFragmentInteractionListener?
+    private val mListener: OnListFragmentInteractionListener?
 ) : RecyclerView.Adapter<SelectorListRecyclerViewAdapter.ViewHolder>() {
 
     private val mOnClickListener: View.OnClickListener
@@ -41,10 +41,10 @@ class SelectorListRecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val (id, item) = mValues[position]
-        holder.mIdView.text = "#ID: " + id
-        holder.mContentView.text = "#NAME: " + item.name
+        holder.mIdView.text = "#ID: $id"
+        holder.mContentView.text = "#NAME: ${item.name}"
 
-        with(holder.mView) {
+        with (holder.mView) {
             tag = id
             setOnClickListener(mOnClickListener)
         }

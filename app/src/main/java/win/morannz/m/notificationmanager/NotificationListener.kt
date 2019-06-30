@@ -8,7 +8,6 @@ import android.os.*
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
-import kotlinx.serialization.json.Json
 
 class NotificationManagerService : NotificationListenerService() {
     private var lastNotificationKey = ""
@@ -26,13 +25,15 @@ class NotificationManagerService : NotificationListenerService() {
 
         // find & play alert group
         val agId = matchNotificationSelector(sbn)?.alertGroupId ?: return
+        Log.d(C.TAG, "Matched selector!")
         val alertGroup = getAlertGroupById(agId) ?: return
+        Log.d(C.TAG, "Matched alert group!")
         playAlertGroup(alertGroup)
     }
 
     private fun screenIsOn(): Boolean {
         val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
-        return pm.isInteractive()
+        return pm.isInteractive
     }
 
     private fun getRingerMode(audioManager: AudioManager): Int {
@@ -75,7 +76,7 @@ class NotificationManagerService : NotificationListenerService() {
                     continue
 
             // limit frequency of alerts
-            if (System.currentTimeMillis() < getNotificationSelectorLastAlertTime(this, id) + ns.minMillisecsBetweenAlerts)
+            if (System.currentTimeMillis() < getNotificationSelectorLastAlertTime(this, id) + ns.minSecsBetweenAlerts * 1000)
                 continue
 
             // if everything matches, return the selector
@@ -90,7 +91,7 @@ class NotificationManagerService : NotificationListenerService() {
     private fun getAlertGroupById(id: Int): AlertGroup? {
         val alertGroups = getAlertGroups(this)
         val ag = alertGroups[id] ?: return null
-        if (System.currentTimeMillis() > getAlertGroupLastAlertTime(this, id) + ag.minMillisecsBetweenAlerts) {
+        if (System.currentTimeMillis() > getAlertGroupLastAlertTime(this, id) + ag.minSecsBetweenAlerts * 1000) {
             saveAlertGroupLastAlertTime(this, id, System.currentTimeMillis())
             return ag
         }

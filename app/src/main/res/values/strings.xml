@@ -32,17 +32,41 @@
     <string name="selector_edit_label_package_name">Application</string>
     <string name="selector_edit_label_match_title">Match this title (regular expression)</string>
     <string name="selector_edit_label_match_text">Match this text (regular expression)</string>
-    <string name="selector_edit_label_min_millisecs_between_alerts">Minimum milliseconds between alerts</string>
+    <string name="selector_edit_label_min_secs_between_alerts">Minimum seconds between alerts</string>
     <string name="selector_edit_cancel_edit">Cancel edits</string>
     <string name="selector_edit_delete">Delete</string>
 
     <!-- Edit Alert -->
     <string name="alert_edit_label_name">Name</string>
     <string name="alert_edit_label_comment">Comment</string>
-    <string name="alert_edit_label_min_millisecs_between_alerts">Minimum milliseconds between alerts</string>
+    <string name="alert_edit_label_min_secs_between_alerts">Minimum seconds between alerts</string>
     <string name="alert_edit_cancel_edit">Cancel edits</string>
     <string name="alert_edit_delete">Delete</string>
     <string name="alert_edit_sound_uri">Ringtone / notification sound</string>
+    <string name="alert_edit_vibration_pattern">Vibration pattern</string>
+    <string name="alert_edit_alert_when_screen_on">Alert when screen is on</string>
+    <string name="alert_edit_absolute_volume">Absolute volume percent</string>
+    <string name="alert_edit_volume_percent">Volume percent</string>
+    <string name="alert_edit_ringer_modes_heading">Ringer modes</string>
+    <string name="alert_edit_sound_ringer_modes">Sound:</string>
+    <string name="alert_edit_sound_ringer_mode_dnd">DND</string>
+    <string name="alert_edit_sound_ringer_mode_silent">Silent</string>
+    <string name="alert_edit_sound_ringer_mode_vibrate">Vibrate</string>
+    <string name="alert_edit_sound_ringer_mode_normal">Normal</string>
+    <string name="alert_edit_vibration_ringer_modes">Vibration:</string>
+    <string name="alert_edit_vibration_ringer_mode_dnd">DND</string>
+    <string name="alert_edit_vibration_ringer_mode_silent">Silent</string>
+    <string name="alert_edit_vibration_ringer_mode_vibrate">Vibrate</string>
+    <string name="alert_edit_vibration_ringer_mode_normal">Normal</string>
+    <string name="alert_edit_relative_volume_stream">Relative volume stream</string>
+    <string name="alert_edit_relative_volume_stream_notification">Notification</string>
+    <string name="alert_edit_relative_volume_stream_alarm">Alarm</string>
+    <string name="alert_edit_relative_volume_stream_music">Music</string>
+    <string name="alert_edit_relative_volume_stream_accessibility">Accessibility</string>
+    <string name="alert_edit_relative_volume_stream_system">System</string>
+    <string name="alert_edit_relative_volume_stream_voice_call">Voice call</string>
+    <string name="alert_edit_relative_volume_stream_dtmf">DTMF</string>
+    <string name="alert_edit_relative_volume_stream_ring">Ring</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

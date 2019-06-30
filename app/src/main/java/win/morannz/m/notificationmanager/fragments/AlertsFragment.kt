@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import kotlinx.android.synthetic.main.fragment_alerts.*
 import win.morannz.m.notificationmanager.C
 import win.morannz.m.notificationmanager.R
 
@@ -46,9 +47,13 @@ class AlertsFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_alerts, container, false)
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    fun onButtonPressed() {
-        listener?.onFragmentInteraction(C.ALERT_GROUP, "")
+
+
+    override fun onStart() {
+        super.onStart()
+        btn_add_alert.setOnClickListener {
+            listener?.onFragmentInteraction(C.NEW_ALERT_GROUP, C.NO_DATA)
+        }
     }
 
     override fun onAttach(context: Context) {

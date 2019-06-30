@@ -40,8 +40,8 @@ class AlertListRecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val (id, item) = mValues[position]
-        holder.mIdView.text = "#ID: ${C.ALERT_GROUP} $id"
-        holder.mContentView.text = "#NAME: ${C.ALERT_GROUP} ${item.name}"
+        holder.mIdView.text = "#ID: $id"
+        holder.mContentView.text = "#NAME: ${item.name}"
 
         with (holder.mView) {
             tag = id

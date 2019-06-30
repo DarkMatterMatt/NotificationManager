@@ -37,7 +37,8 @@ enum class FragmentId {
 }
 
 object RingerMode {
-    const val SILENT = 1
-    const val VIBRATE = 2
-    const val NORMAL = 4
+    const val DND = 1
+    const val SILENT = 2
+    const val VIBRATE = 4
+    const val NORMAL = 8
 }

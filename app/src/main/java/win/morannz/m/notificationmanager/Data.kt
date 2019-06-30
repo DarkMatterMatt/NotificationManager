@@ -20,12 +20,12 @@ import kotlinx.serialization.internal.IntSerializer
 data class NotificationSelector (
     var name: String = "",
     var comment: String = "",
+    var minSecsBetweenAlerts: Int = 0,
 
     var alertGroupId: Int? = null,
     var packageName: String? = null,
     var matchText: String? = null,
     var matchTitle: String? = null,
-    var minMillisecsBetweenAlerts: Int = 0,
     var disabled: Boolean = false
 )
 
@@ -33,10 +33,10 @@ data class NotificationSelector (
 data class AlertGroup (
     var name: String = "",
     var comment: String = "",
+    var minSecsBetweenAlerts: Int = 0,
 
     var vibrationPattern: String? = null,
     var soundUri: String? = null,
-    var minMillisecsBetweenAlerts: Int = 0,
     var alertWhenScreenOn: Boolean = true,
 
     var volumePercent: Int = 100,

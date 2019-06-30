@@ -8,7 +8,6 @@ import android.view.*
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import androidx.fragment.app.Fragment
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_selector_edit.*
 import kotlinx.serialization.json.Json
 import win.morannz.m.notificationmanager.*
@@ -79,7 +78,7 @@ class SelectorEditFragment : Fragment() {
         selector_edit_package_name.saveAfterTextChanged { ns.packageName = it }
         selector_edit_match_title.saveAfterTextChanged { ns.matchTitle = it }
         selector_edit_match_text.saveAfterTextChanged { ns.matchText = it }
-        selector_edit_min_millisecs_between_alerts.saveAfterTextChanged { ns.minMillisecsBetweenAlerts = it.toInt() }
+        selector_edit_min_secs_between_alerts.saveAfterTextChanged { if (it != "") ns.minSecsBetweenAlerts = it.toInt() }
     }
 
     private fun populateFields(ns: NotificationSelector) {
@@ -90,17 +89,15 @@ class SelectorEditFragment : Fragment() {
         selector_edit_package_name.setText(ns.packageName)
         selector_edit_match_title.setText(ns.matchTitle)
         selector_edit_match_text.setText(ns.matchText)
-        selector_edit_min_millisecs_between_alerts.setText(ns.minMillisecsBetweenAlerts.toString())
+        selector_edit_min_secs_between_alerts.setText(ns.minSecsBetweenAlerts.toString())
         textWatchersEnabled = true
     }
 
     override fun onStart() {
         super.onStart()
 
-        // populate existing data
-        if (!createNew) {
-            populateFields(ns)
-        }
+        // populate existing data (or blank template if creating a new alert group)
+        populateFields(ns)
 
         // add options for alertGroup dropdown
         val alertGroupAdapter = ArrayAdapter(
