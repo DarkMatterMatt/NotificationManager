@@ -2,12 +2,15 @@ package win.morannz.m.notificationmanager
 
 import android.app.Notification
 import android.content.Context
+import android.content.Intent
 import android.media.*
 import android.net.Uri
 import android.os.*
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import kotlinx.serialization.json.Json
 
 class NotificationManagerService : NotificationListenerService() {
     private var lastNotificationKey = ""
@@ -22,9 +25,15 @@ class NotificationManagerService : NotificationListenerService() {
 
         // save notification
         val recentNotifications = getRecentNotifications(this)
-        recentNotifications.add(0, extractDataFromStatusBarNotification(sbn))
+        val rn = extractDataFromStatusBarNotification(sbn)
+        recentNotifications.add(0, rn)
         saveRecentNotifications(this, recentNotifications.take(C.MAX_NUMBER_OF_RECENT_NOTIFICATIONS).toMutableList())
         recordPackageWithNotifications(this, sbn.packageName)
+
+        // refresh recents list if open
+        val i = Intent(C.REFRESH_RECENTS_LIST_INTENT)
+        i.putExtra(C.RECENT_NOTIFICATION, Json.stringify(RecentNotification.serializer(), rn))
+        LocalBroadcastManager.getInstance(this).sendBroadcast(i)
 
         // find & play alert group
         val agId = matchNotificationSelector(sbn)?.alertGroupId ?: return

@@ -2,6 +2,7 @@ package win.morannz.m.notificationmanager.fragments
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -9,9 +10,8 @@ import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import win.morannz.m.notificationmanager.R
+import win.morannz.m.notificationmanager.*
 import win.morannz.m.notificationmanager.adapters.RecentListRecyclerViewAdapter
-import win.morannz.m.notificationmanager.getRecentNotifications
 
 /**
  * A fragment representing a list of Items.
@@ -22,8 +22,15 @@ class RecentsListFragment : Fragment() {
 
     // TODO: Customize parameters
     private var columnCount = 1
-
     private var listener: OnListFragmentInteractionListener? = null
+    private var listAdapter: RecentListRecyclerViewAdapter? = null
+    private var recentNotifications = mutableListOf<RecentNotification>()
+
+    fun refreshWithNewNotification(rn: RecentNotification) {
+        recentNotifications.add(0, rn)
+        recentNotifications.removeAt(C.MAX_NUMBER_OF_RECENT_NOTIFICATIONS)
+        listAdapter?.notifyDataSetChanged()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +45,8 @@ class RecentsListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_recent_list, container, false)
+        recentNotifications = getRecentNotifications(activity!!.applicationContext)
+        listAdapter = RecentListRecyclerViewAdapter(recentNotifications, listener)
 
         // Set the adapter
         if (view is RecyclerView) {
@@ -46,8 +55,7 @@ class RecentsListFragment : Fragment() {
                     columnCount <= 1 -> LinearLayoutManager(context)
                     else -> GridLayoutManager(context, columnCount)
                 }
-                val recentNotifications = getRecentNotifications(activity!!.applicationContext)
-                adapter = RecentListRecyclerViewAdapter(recentNotifications.toList(), listener)
+                adapter = listAdapter
             }
         }
         return view

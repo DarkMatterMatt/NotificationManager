@@ -10,12 +10,17 @@ import android.service.notification.NotificationListenerService.requestRebind
 import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.activity_main.*
 import win.morannz.m.notificationmanager.fragments.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.IntentFilter
+import android.util.Log
+import kotlinx.serialization.json.Json
 
 
 class MainActivity : AppCompatActivity(),
@@ -28,6 +33,22 @@ class MainActivity : AppCompatActivity(),
     RecentsFragment.OnFragmentInteractionListener,
     RecentsListFragment.OnListFragmentInteractionListener {
     //RecentViewFragment.OnFragmentInteractionListener {
+
+    private var localBroadcastManager : LocalBroadcastManager? = null
+
+    private val broadcastReciever = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (intent.action == C.REFRESH_RECENTS_LIST_INTENT) {
+                val rnString = intent.getStringExtra(C.RECENT_NOTIFICATION)
+                val rn = Json.parse(RecentNotification.serializer(), rnString)
+                val fragment = supportFragmentManager.findFragmentById(R.id.fragment)?.childFragmentManager?.findFragmentById(R.id.fragment_recent_list)
+                if (fragment !== null && fragment is RecentsListFragment) {
+                    Log.d(C.TAG, "Refresh recents list")
+                    fragment.refreshWithNewNotification(rn)
+                }
+            }
+        }
+    }
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener {
         navigate(
@@ -69,47 +90,17 @@ class MainActivity : AppCompatActivity(),
             showNotificationServiceAlertDialog()
         }
 
-        /*// Alert Groups
-        val alertGroups = mutableMapOf<Int, AlertGroup>() //getAlertGroups(this)
-        var agMaxIndex = -1 //getAlertGroupMaxIndex(this)
-        for (i in 0..19) {
-            alertGroups.put(
-                ++agMaxIndex, AlertGroup(
-                    name = "Alert Group $i",
-                    vibrationPattern = longArrayOf(
-                        0,
-                        i * 100L,
-                        2000 - i * 100L,
-                        i * 100L,
-                        2000 - i * 100L
-                    ).joinToString(",")
-                )
-            )
-        }
-        saveAlertGroupMaxIndex(this, agMaxIndex)
-        saveAlertGroups(this, alertGroups)
-
-        // Notification Selectors
-        val notificationSelectors = mutableMapOf<Int, NotificationSelector>() //getNotificationSelectors(this)
-        var nsMaxIndex = -1 //getNotificationSelectorMaxIndex(this)
-        for (i in 0..19) {
-            notificationSelectors.put(
-                ++nsMaxIndex, NotificationSelector(
-                    alertGroupId = i,
-                    name = "Pushbullet NS $i",
-                    packageName = "com.pushbullet.android",
-                    matchText = """yeet $i"""
-                )
-            )
-        }
-        saveNotificationSelectorMaxIndex(this, nsMaxIndex)
-        saveNotificationSelectors(this, notificationSelectors)*/
-
         restartNotificationService()
+
+        localBroadcastManager = LocalBroadcastManager.getInstance(this)
+        val intentFilter = IntentFilter()
+        intentFilter.addAction(C.REFRESH_RECENTS_LIST_INTENT)
+        localBroadcastManager?.registerReceiver(broadcastReciever, intentFilter)
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        localBroadcastManager?.unregisterReceiver(broadcastReciever);
     }
 
     override fun onListFragmentInteraction(type: String, item: Any) {
