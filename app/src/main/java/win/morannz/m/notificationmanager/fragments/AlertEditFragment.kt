@@ -55,15 +55,21 @@ class AlertEditFragment : Fragment() {
         // deep copy the AlertGroup
         agBackup = Json.parse(AlertGroup.serializer(), Json.stringify(AlertGroup.serializer(), ag))
 
+        /* Note:
+         *   on Mi 8SE the following streams are used
+         *      STREAM_MUSIC
+         *      STREAM_NOTIFICATION, STREAM_DTMF, STREAM_RING, STREAM_SYSTEM <- these are all changed together
+         *      STREAM_ALARM
+         */
         relativeVolumeStreams = mutableMapOf(
-            getString(R.string.alert_edit_relative_volume_stream_notification) to AudioManager.STREAM_NOTIFICATION,
-            getString(R.string.alert_edit_relative_volume_stream_alarm) to AudioManager.STREAM_ALARM,
             getString(R.string.alert_edit_relative_volume_stream_music) to AudioManager.STREAM_MUSIC,
+            getString(R.string.alert_edit_relative_volume_stream_notification) to AudioManager.STREAM_NOTIFICATION,
+            getString(R.string.alert_edit_relative_volume_stream_alarm) to AudioManager.STREAM_ALARM
             //getString(R.string.alert_edit_relative_volume_stream_accessibility) to AudioManager.STREAM_ACCESSIBILITY,
-            getString(R.string.alert_edit_relative_volume_stream_system) to AudioManager.STREAM_SYSTEM,
-            getString(R.string.alert_edit_relative_volume_stream_voice_call) to AudioManager.STREAM_VOICE_CALL,
-            getString(R.string.alert_edit_relative_volume_stream_dtmf) to AudioManager.STREAM_DTMF,
-            getString(R.string.alert_edit_relative_volume_stream_ring) to AudioManager.STREAM_RING
+            //getString(R.string.alert_edit_relative_volume_stream_system) to AudioManager.STREAM_SYSTEM,
+            //getString(R.string.alert_edit_relative_volume_stream_voice_call) to AudioManager.STREAM_VOICE_CALL,
+            //getString(R.string.alert_edit_relative_volume_stream_dtmf) to AudioManager.STREAM_DTMF,
+            //getString(R.string.alert_edit_relative_volume_stream_ring) to AudioManager.STREAM_RING
         )
 
         setHasOptionsMenu(true)

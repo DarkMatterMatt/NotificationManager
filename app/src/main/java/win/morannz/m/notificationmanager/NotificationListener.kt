@@ -37,9 +37,7 @@ class NotificationManagerService : NotificationListenerService() {
 
         // find & play alert group
         val agId = matchNotificationSelector(sbn)?.alertGroupId ?: return
-        Log.d(C.TAG, "Matched selector!")
         val alertGroup = matchAlertGroupById(agId) ?: return
-        Log.d(C.TAG, "Matched alert group!")
         playAlertGroup(alertGroup)
     }
 
@@ -118,14 +116,12 @@ class NotificationManagerService : NotificationListenerService() {
     private fun playSound(alertGroup: AlertGroup) {
         val sound = Uri.parse(alertGroup.soundUri) ?: return
         val am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        Log.d(C.TAG, "Playing sound: ${sound.toString()}")
 
         // only alert for enabled ringer modes
         if ((alertGroup.soundRingerModes and getRingerMode(am)) == 0) return
 
         // we temporarily change the volume so store original value
         val previousVolume = am.getStreamVolume(AudioManager.STREAM_ALARM)
-        Log.d(C.TAG, "Previous volume: $previousVolume")
         val ringtone = RingtoneManager.getRingtone(applicationContext, sound) ?: return
 
         ringtone.audioAttributes = AudioAttributes.Builder()
@@ -137,7 +133,6 @@ class NotificationManagerService : NotificationListenerService() {
         if (!alertGroup.absoluteVolume) {
             volume *= am.getStreamVolume(alertGroup.relativeVolumeStream) / am.getStreamMaxVolume(alertGroup.relativeVolumeStream).toFloat()
         }
-        Log.d(C.TAG, "volume: $volume")
 
         // use ringtone volume if possible
         if (Build.VERSION.SDK_INT >= 28) {
