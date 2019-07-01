@@ -102,7 +102,6 @@ class AlertEditFragment : Fragment() {
         alert_edit_sound_ringer_modes_group.addOnButtonCheckedListener { _, _, _ ->
             if (textWatchersEnabled) {
                 var x = 0
-                if (alert_edit_sound_ringer_mode_dnd.isChecked) x += RingerMode.DND
                 if (alert_edit_sound_ringer_mode_silent.isChecked) x += RingerMode.SILENT
                 if (alert_edit_sound_ringer_mode_vibrate.isChecked) x += RingerMode.VIBRATE
                 if (alert_edit_sound_ringer_mode_normal.isChecked) x += RingerMode.NORMAL
@@ -114,7 +113,6 @@ class AlertEditFragment : Fragment() {
         alert_edit_vibration_ringer_modes_group.addOnButtonCheckedListener { _, _, _ ->
             if (textWatchersEnabled) {
                 var x = 0
-                if (alert_edit_vibration_ringer_mode_dnd.isChecked) x += RingerMode.DND
                 if (alert_edit_vibration_ringer_mode_silent.isChecked) x += RingerMode.SILENT
                 if (alert_edit_vibration_ringer_mode_vibrate.isChecked) x += RingerMode.VIBRATE
                 if (alert_edit_vibration_ringer_mode_normal.isChecked) x += RingerMode.NORMAL
@@ -136,11 +134,9 @@ class AlertEditFragment : Fragment() {
         alert_edit_alert_when_screen_on.isChecked = ag.alertWhenScreenOn
         alert_edit_absolute_volume.isChecked = ag.absoluteVolume
         alert_edit_volume_percent.setText(ag.volumePercent.toString())
-        alert_edit_sound_ringer_mode_dnd.isChecked = (ag.soundRingerModes and RingerMode.DND) != 0
         alert_edit_sound_ringer_mode_silent.isChecked = (ag.soundRingerModes and RingerMode.SILENT) != 0
         alert_edit_sound_ringer_mode_vibrate.isChecked = (ag.soundRingerModes and RingerMode.VIBRATE) != 0
         alert_edit_sound_ringer_mode_normal.isChecked = (ag.soundRingerModes and RingerMode.NORMAL) != 0
-        alert_edit_vibration_ringer_mode_dnd.isChecked = (ag.vibrationRingerModes and RingerMode.DND) != 0
         alert_edit_vibration_ringer_mode_silent.isChecked = (ag.vibrationRingerModes and RingerMode.SILENT) != 0
         alert_edit_vibration_ringer_mode_vibrate.isChecked = (ag.vibrationRingerModes and RingerMode.VIBRATE) != 0
         alert_edit_vibration_ringer_mode_normal.isChecked = (ag.vibrationRingerModes and RingerMode.NORMAL) != 0

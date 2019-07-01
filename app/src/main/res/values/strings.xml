@@ -49,12 +49,10 @@
     <string name="alert_edit_volume_percent">Volume percent</string>
     <string name="alert_edit_ringer_modes_heading">Ringer modes</string>
     <string name="alert_edit_sound_ringer_modes">Sound:</string>
-    <string name="alert_edit_sound_ringer_mode_dnd">DND</string>
     <string name="alert_edit_sound_ringer_mode_silent">Silent</string>
     <string name="alert_edit_sound_ringer_mode_vibrate">Vibrate</string>
     <string name="alert_edit_sound_ringer_mode_normal">Normal</string>
     <string name="alert_edit_vibration_ringer_modes">Vibration:</string>
-    <string name="alert_edit_vibration_ringer_mode_dnd">DND</string>
     <string name="alert_edit_vibration_ringer_mode_silent">Silent</string>
     <string name="alert_edit_vibration_ringer_mode_vibrate">Vibrate</string>
     <string name="alert_edit_vibration_ringer_mode_normal">Normal</string>
