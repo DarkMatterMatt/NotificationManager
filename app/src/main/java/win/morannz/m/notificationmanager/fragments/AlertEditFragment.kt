@@ -98,7 +98,7 @@ class AlertEditFragment : Fragment() {
                 saveAlertGroups(activity!!.applicationContext, alertGroups)
             }
         }
-        alert_edit_volume_percent.saveAfterTextChanged { ag.volumePercent = it.toInt() }
+        alert_edit_volume_percent.saveAfterTextChanged { if (it != "") ag.volumePercent = it.toInt() }
         alert_edit_sound_ringer_modes_group.addOnButtonCheckedListener { _, _, _ ->
             if (textWatchersEnabled) {
                 var x = 0
@@ -111,7 +111,7 @@ class AlertEditFragment : Fragment() {
                 saveAlertGroups(activity!!.applicationContext, alertGroups)
             }
         }
-        alert_edit_vibration_ringer_modes_group.addOnButtonCheckedListener { _, modeIdChanged, isChecked ->
+        alert_edit_vibration_ringer_modes_group.addOnButtonCheckedListener { _, _, _ ->
             if (textWatchersEnabled) {
                 var x = 0
                 if (alert_edit_vibration_ringer_mode_dnd.isChecked) x += RingerMode.DND

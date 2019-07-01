@@ -11,11 +11,14 @@ import android.util.Log
 
 class NotificationManagerService : NotificationListenerService() {
     private var lastNotificationKey = ""
+    private var lastNotificationTime = 0L
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         // filter duplicate notifications
-        if (sbn.key == lastNotificationKey) return
+        if (sbn.key == lastNotificationKey && System.currentTimeMillis() < lastNotificationTime + 100) return
         lastNotificationKey = sbn.key
+        lastNotificationTime = System.currentTimeMillis()
+        Log.d(C.TAG, "Notification posted: ${sbn.key}")
 
         // save notification
         val recentNotifications = getRecentNotifications(this)
@@ -26,7 +29,7 @@ class NotificationManagerService : NotificationListenerService() {
         // find & play alert group
         val agId = matchNotificationSelector(sbn)?.alertGroupId ?: return
         Log.d(C.TAG, "Matched selector!")
-        val alertGroup = getAlertGroupById(agId) ?: return
+        val alertGroup = matchAlertGroupById(agId) ?: return
         Log.d(C.TAG, "Matched alert group!")
         playAlertGroup(alertGroup)
     }
@@ -53,31 +56,36 @@ class NotificationManagerService : NotificationListenerService() {
 
         // loop through all selectors
         for ((id, ns) in notificationSelectors) {
-
             // ignore disabled selectors
             if (ns.disabled) {
                 continue
             }
 
             // app creating notification must match (null = do not try to match)
-            if (ns.packageName !== null && ns.packageName != sbn.packageName)
+            if (ns.packageName !== null && ns.packageName != sbn.packageName) {
                 continue
+            }
 
             // notification title must match (null = do not try to match)
             val matchTitle = ns.matchTitle
-            if (matchTitle !== null)
-                if (title === null || !matchTitle.toRegex().matches(title))
+            if (matchTitle !== null) {
+                if (title === null || !matchTitle.toRegex().matches(title)) {
                     continue
+                }
+            }
 
             // notification content must match (null = do not try to match)
             val matchText = ns.matchText
-            if (matchText !== null)
-                if (text === null || !matchText.toRegex().matches(text))
+            if (matchText !== null) {
+                if (text === null || !matchText.toRegex().matches(text)) {
                     continue
+                }
+            }
 
             // limit frequency of alerts
-            if (System.currentTimeMillis() < getNotificationSelectorLastAlertTime(this, id) + ns.minSecsBetweenAlerts * 1000)
+            if (System.currentTimeMillis() < getNotificationSelectorLastAlertTime(this, id) + ns.minSecsBetweenAlerts * 1000) {
                 continue
+            }
 
             // if everything matches, return the selector
             saveNotificationSelectorLastAlertTime(this, id, System.currentTimeMillis())
@@ -88,7 +96,7 @@ class NotificationManagerService : NotificationListenerService() {
         return null
     }
 
-    private fun getAlertGroupById(id: Int): AlertGroup? {
+    private fun matchAlertGroupById(id: Int): AlertGroup? {
         val alertGroups = getAlertGroups(this)
         val ag = alertGroups[id] ?: return null
         if (System.currentTimeMillis() > getAlertGroupLastAlertTime(this, id) + ag.minSecsBetweenAlerts * 1000) {
@@ -99,14 +107,16 @@ class NotificationManagerService : NotificationListenerService() {
     }
 
     private fun playSound(alertGroup: AlertGroup) {
-        val sound = Uri.parse(alertGroup.soundUri ?: return) ?: return
+        val sound = Uri.parse(alertGroup.soundUri) ?: return
         val am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        Log.d(C.TAG, "Playing sound: ${sound.toString()}")
 
         // only alert for enabled ringer modes
         if ((alertGroup.soundRingerModes and getRingerMode(am)) == 0) return
 
         // we temporarily change the volume so store original value
         val previousVolume = am.getStreamVolume(AudioManager.STREAM_ALARM)
+        Log.d(C.TAG, "Previous volume: $previousVolume")
         val ringtone = RingtoneManager.getRingtone(applicationContext, sound) ?: return
 
         ringtone.audioAttributes = AudioAttributes.Builder()
@@ -115,8 +125,10 @@ class NotificationManagerService : NotificationListenerService() {
             .build()
 
         var volume = alertGroup.volumePercent / 100F
-        if (!alertGroup.absoluteVolume)
-            volume *= am.getStreamVolume(alertGroup.relativeVolumeStream) / am.getStreamMaxVolume(alertGroup.relativeVolumeStream)
+        if (!alertGroup.absoluteVolume) {
+            volume *= am.getStreamVolume(alertGroup.relativeVolumeStream) / am.getStreamMaxVolume(alertGroup.relativeVolumeStream).toFloat()
+        }
+        Log.d(C.TAG, "volume: $volume")
 
         // use ringtone volume if possible
         if (Build.VERSION.SDK_INT >= 28) {
