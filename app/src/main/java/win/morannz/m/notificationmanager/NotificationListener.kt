@@ -14,13 +14,13 @@ import kotlinx.serialization.json.Json
 import kotlin.math.roundToInt
 
 class NotificationManagerService : NotificationListenerService() {
-    private var lastNotificationKey = ""
+    private var mLastNotificationKey = ""
     private var lastNotificationTime = 0L
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         // filter duplicate notifications
-        if (sbn.key == lastNotificationKey && System.currentTimeMillis() < lastNotificationTime + 100) return
-        lastNotificationKey = sbn.key
+        if (sbn.key == mLastNotificationKey && System.currentTimeMillis() < lastNotificationTime + 100) return
+        mLastNotificationKey = sbn.key
         lastNotificationTime = System.currentTimeMillis()
         Log.d(C.TAG, "Notification posted: ${sbn.key}")
 
