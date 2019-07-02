@@ -9,7 +9,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,61 +21,107 @@ import win.morannz.m.notificationmanager.*
 
 
 class AlertEditFragment : Fragment() {
-    private var agId: Int = -1
-    private var ag: AlertGroup = AlertGroup()
-    private var agBackup: AlertGroup = AlertGroup()
-    private var createNew: Boolean = false
-    private var listener: OnFragmentInteractionListener? = null
-    private var alertGroups: MutableMap<Int, AlertGroup> = mutableMapOf()
-    private var textWatchersEnabled: Boolean = true
-    private var relativeVolumeStreams = mutableMapOf<String, Int>()
+    private var mAgId: Int = -1
+    private var mAg: AlertGroup = AlertGroup()
+    private var mAgBackup: AlertGroup = AlertGroup()
+    private var mCreateNew: Boolean = false
+    private var mListener: OnFragmentInteractionListener? = null
+    private var mAlertGroups = mutableMapOf<Int, AlertGroup>()
+    private var mTextWatchersEnabled: Boolean = true
+    private var mRelativeVolumeStreams = mutableMapOf<String, Int>()
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is OnFragmentInteractionListener) {
+            mListener = context
+        } else {
+            throw RuntimeException("$context must implement OnFragmentInteractionListener")
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        mCreateNew = arguments?.getBoolean(C.NEW_ALERT_GROUP) ?: false
+        mAgId = arguments?.getInt(C.ALERT_GROUP, -1) ?: -1
+        mAlertGroups = getAlertGroups(context!!)
+        mAg = mAlertGroups[mAgId] ?: AlertGroup()
+
+        // deep copy the AlertGroup
+        mAgBackup = Json.parse(AlertGroup.serializer(), Json.stringify(AlertGroup.serializer(), mAg))
+
+        /* Note -
+         *   on Mi 8SE the following streams are used:
+         *      STREAM_MUSIC, STREAM_ACCESSIBILITY - these are both changed together
+         *      STREAM_NOTIFICATION, STREAM_DTMF, STREAM_RING, STREAM_SYSTEM - these are all changed together
+         *      STREAM_ALARM
+         *   other streams available:
+         *      STREAM_VOICE_CALL - most likely can only be changed during phone call, probably irrelevant to this app
+         */
+        mRelativeVolumeStreams = mutableMapOf(
+            getString(R.string.alert_edit_relative_volume_stream_notification) to AudioManager.STREAM_NOTIFICATION,
+            getString(R.string.alert_edit_relative_volume_stream_music) to AudioManager.STREAM_MUSIC,
+            getString(R.string.alert_edit_relative_volume_stream_alarm) to AudioManager.STREAM_ALARM
+        )
+
+        setHasOptionsMenu(true)
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        // inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_alert_edit, container, false)
+    }
+
+
+    override fun onStart() {
+        super.onStart()
+
+        // populate existing data (or blank template if creating a new alert group)
+        populateFields(mAg)
+
+        // add options for alertGroup dropdown
+        val relativeVolumeStreamAdapter = ArrayAdapter(
+            activity!!.applicationContext,
+            android.R.layout.simple_dropdown_item_1line,
+            mRelativeVolumeStreams.keys.toList()
+        )
+        alert_edit_relative_volume_stream.setAdapter(relativeVolumeStreamAdapter)
+
+        // add textWatchers
+        registerWatchers()
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        mListener = null
+    }
+
+    interface OnFragmentInteractionListener {
+        fun onFragmentInteraction(type: String, data: Any)
+    }
 
     private fun EditText.saveAfterTextChanged(afterTextChanged: (String) -> Unit) {
         this.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun afterTextChanged(editable: Editable?) {
-                if (textWatchersEnabled) {
+                if (mTextWatchersEnabled) {
                     afterTextChanged.invoke(editable.toString())
-                    alertGroups[agId] = ag
-                    saveAlertGroups(activity!!.applicationContext, alertGroups)
+                    save()
                 }
             }
         })
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        createNew = arguments?.getBoolean(C.NEW_ALERT_GROUP) ?: false
-        agId = arguments?.getInt(C.ALERT_GROUP, -1) ?: -1
-        alertGroups = getAlertGroups(activity!!.applicationContext)
-        ag = alertGroups[agId] ?: AlertGroup()
-
-        // deep copy the AlertGroup
-        agBackup = Json.parse(AlertGroup.serializer(), Json.stringify(AlertGroup.serializer(), ag))
-
-        /* Note:
-         *   on Mi 8SE the following streams are used
-         *      STREAM_MUSIC
-         *      STREAM_NOTIFICATION, STREAM_DTMF, STREAM_RING, STREAM_SYSTEM <- these are all changed together
-         *      STREAM_ALARM
-         */
-        relativeVolumeStreams = mutableMapOf(
-            getString(R.string.alert_edit_relative_volume_stream_music) to AudioManager.STREAM_MUSIC,
-            getString(R.string.alert_edit_relative_volume_stream_notification) to AudioManager.STREAM_NOTIFICATION,
-            getString(R.string.alert_edit_relative_volume_stream_alarm) to AudioManager.STREAM_ALARM
-            //getString(R.string.alert_edit_relative_volume_stream_accessibility) to AudioManager.STREAM_ACCESSIBILITY,
-            //getString(R.string.alert_edit_relative_volume_stream_system) to AudioManager.STREAM_SYSTEM,
-            //getString(R.string.alert_edit_relative_volume_stream_voice_call) to AudioManager.STREAM_VOICE_CALL,
-            //getString(R.string.alert_edit_relative_volume_stream_dtmf) to AudioManager.STREAM_DTMF,
-            //getString(R.string.alert_edit_relative_volume_stream_ring) to AudioManager.STREAM_RING
-        )
-
-        setHasOptionsMenu(true)
+    private fun save() {
+        mAlertGroups[mAgId] = mAg
+        saveAlertGroups(context!!, mAlertGroups)
     }
 
     private fun getRelativeVolumeStreamString(stream: Int): String {
-        for ((k, v) in relativeVolumeStreams) {
+        for ((k, v) in mRelativeVolumeStreams) {
             if (v == stream) {
                 return k
             }
@@ -85,53 +130,50 @@ class AlertEditFragment : Fragment() {
     }
 
     private fun registerWatchers() {
-        alert_edit_name.saveAfterTextChanged { ag.name = it }
-        alert_edit_comment.saveAfterTextChanged { ag.comment = it }
-        alert_edit_min_secs_between_alerts.saveAfterTextChanged { if (it != "") ag.minSecsBetweenAlerts = it.toInt() }
+        alert_edit_name.saveAfterTextChanged { mAg.name = it }
+        alert_edit_comment.saveAfterTextChanged { mAg.comment = it }
+        alert_edit_min_secs_between_alerts.saveAfterTextChanged { if (it != "") mAg.minSecsBetweenAlerts = it.toInt() }
         alert_edit_sound_uri.setOnClickListener { selectSoundUri() }
-        alert_edit_vibration_pattern.saveAfterTextChanged { ag.vibrationPattern = it }
+        alert_edit_vibration_pattern.saveAfterTextChanged { mAg.vibrationPattern = it }
         alert_edit_alert_when_screen_on.setOnCheckedChangeListener { _, isChecked ->
-            if (textWatchersEnabled) {
-                ag.alertWhenScreenOn = isChecked
-                alertGroups[agId] = ag
-                saveAlertGroups(activity!!.applicationContext, alertGroups)
+            if (mTextWatchersEnabled) {
+                mAg.alertWhenScreenOn = isChecked
+                mAlertGroups[mAgId] = mAg
+                saveAlertGroups(activity!!.applicationContext, mAlertGroups)
             }
         }
         alert_edit_absolute_volume.setOnCheckedChangeListener { _, isChecked ->
-            if (textWatchersEnabled) {
-                ag.absoluteVolume = isChecked
-                alertGroups[agId] = ag
-                saveAlertGroups(activity!!.applicationContext, alertGroups)
+            if (mTextWatchersEnabled) {
+                mAg.absoluteVolume = isChecked
+                save()
             }
         }
-        alert_edit_volume_percent.saveAfterTextChanged { if (it != "") ag.volumePercent = it.toInt() }
+        alert_edit_volume_percent.saveAfterTextChanged { if (it != "") mAg.volumePercent = it.toInt() }
         alert_edit_sound_ringer_modes_group.addOnButtonCheckedListener { _, _, _ ->
-            if (textWatchersEnabled) {
+            if (mTextWatchersEnabled) {
                 var x = 0
                 if (alert_edit_sound_ringer_mode_silent.isChecked) x += RingerMode.SILENT
                 if (alert_edit_sound_ringer_mode_vibrate.isChecked) x += RingerMode.VIBRATE
                 if (alert_edit_sound_ringer_mode_normal.isChecked) x += RingerMode.NORMAL
-                ag.soundRingerModes = x
-                alertGroups[agId] = ag
-                saveAlertGroups(activity!!.applicationContext, alertGroups)
+                mAg.soundRingerModes = x
+                save()
             }
         }
         alert_edit_vibration_ringer_modes_group.addOnButtonCheckedListener { _, _, _ ->
-            if (textWatchersEnabled) {
+            if (mTextWatchersEnabled) {
                 var x = 0
                 if (alert_edit_vibration_ringer_mode_silent.isChecked) x += RingerMode.SILENT
                 if (alert_edit_vibration_ringer_mode_vibrate.isChecked) x += RingerMode.VIBRATE
                 if (alert_edit_vibration_ringer_mode_normal.isChecked) x += RingerMode.NORMAL
-                ag.vibrationRingerModes = x
-                alertGroups[agId] = ag
-                saveAlertGroups(activity!!.applicationContext, alertGroups)
+                mAg.vibrationRingerModes = x
+                save()
             }
         }
-        alert_edit_relative_volume_stream.saveAfterTextChanged { ag.relativeVolumeStream = relativeVolumeStreams[it] ?: AudioManager.STREAM_NOTIFICATION }
+        alert_edit_relative_volume_stream.saveAfterTextChanged { mAg.relativeVolumeStream = mRelativeVolumeStreams[it] ?: AudioManager.STREAM_NOTIFICATION }
     }
 
     private fun populateFields(ag: AlertGroup) {
-        textWatchersEnabled = false
+        mTextWatchersEnabled = false
         alert_edit_name.setText(ag.name)
         alert_edit_comment.setText(ag.comment)
         alert_edit_min_secs_between_alerts.setText(ag.minSecsBetweenAlerts.toString())
@@ -147,52 +189,7 @@ class AlertEditFragment : Fragment() {
         alert_edit_vibration_ringer_mode_vibrate.isChecked = (ag.vibrationRingerModes and RingerMode.VIBRATE) != 0
         alert_edit_vibration_ringer_mode_normal.isChecked = (ag.vibrationRingerModes and RingerMode.NORMAL) != 0
         alert_edit_relative_volume_stream.setText(getRelativeVolumeStreamString(ag.relativeVolumeStream))
-        textWatchersEnabled = true
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_alert_edit, container, false)
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        if (context is OnFragmentInteractionListener) {
-            listener = context
-        } else {
-            throw RuntimeException(context.toString() + " must implement OnFragmentInteractionListener")
-        }
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        listener = null
-    }
-
-    interface OnFragmentInteractionListener {
-        fun onFragmentInteraction(type: String, data: Any)
-    }
-
-
-    override fun onStart() {
-        super.onStart()
-
-        // populate existing data (or blank template if creating a new alert group)
-        populateFields(ag)
-
-        // add options for alertGroup dropdown
-        val relativeVolumeStreamAdapter = ArrayAdapter(
-            activity!!.applicationContext,
-            android.R.layout.simple_dropdown_item_1line,
-            relativeVolumeStreams.keys.toList()
-        )
-        alert_edit_relative_volume_stream.setAdapter(relativeVolumeStreamAdapter)
-
-        // add textWatchers
-        registerWatchers()
+        mTextWatchersEnabled = true
     }
 
     private fun selectSoundUri() {
@@ -209,9 +206,9 @@ class AlertEditFragment : Fragment() {
             if (resultCode == Activity.RESULT_OK) {
                 val uri: Uri? = data?.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
                 if (uri != null) {
-                    ag.soundUri = uri.toString()
-                    alertGroups[agId] = ag
-                    saveAlertGroups(activity!!.applicationContext, alertGroups)
+                    mAg.soundUri = uri.toString()
+                    mAlertGroups[mAgId] = mAg
+                    saveAlertGroups(activity!!.applicationContext, mAlertGroups)
                 }
             }
             if (resultCode == Activity.RESULT_CANCELED) {

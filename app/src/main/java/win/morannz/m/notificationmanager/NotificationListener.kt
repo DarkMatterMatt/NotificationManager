@@ -11,6 +11,7 @@ import android.service.notification.StatusBarNotification
 import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import kotlinx.serialization.json.Json
+import kotlin.math.roundToInt
 
 class NotificationManagerService : NotificationListenerService() {
     private var lastNotificationKey = ""
@@ -122,47 +123,50 @@ class NotificationManagerService : NotificationListenerService() {
 
         // we temporarily change the volume so store original value
         val previousVolume = am.getStreamVolume(AudioManager.STREAM_ALARM)
-        val ringtone = RingtoneManager.getRingtone(applicationContext, sound) ?: return
+        val ringtone = RingtoneManager.getRingtone(this, sound) ?: return
 
         ringtone.audioAttributes = AudioAttributes.Builder()
             .setUsage(AudioAttributes.USAGE_ALARM)
             .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
             .build()
 
-        var volume = alertGroup.volumePercent / 100F
+        var volumePercent = alertGroup.volumePercent / 100F
+        val relativeStreamVolumePercent = am.getStreamVolume(alertGroup.relativeVolumeStream) / am.getStreamMaxVolume(alertGroup.relativeVolumeStream).toFloat()
+        val alarmStreamVolumePercent = am.getStreamVolume(AudioManager.STREAM_ALARM) / am.getStreamMaxVolume(AudioManager.STREAM_ALARM).toFloat()
         if (!alertGroup.absoluteVolume) {
-            volume *= am.getStreamVolume(alertGroup.relativeVolumeStream) / am.getStreamMaxVolume(alertGroup.relativeVolumeStream).toFloat()
+            volumePercent *= relativeStreamVolumePercent
         }
 
-        // use ringtone volume if possible
-        if (Build.VERSION.SDK_INT >= 28) {
-            ringtone.volume = volume
-            am.setStreamVolume(
-                AudioManager.STREAM_ALARM,
-                am.getStreamMaxVolume(AudioManager.STREAM_ALARM),
-                AudioManager.FLAG_REMOVE_SOUND_AND_VIBRATE
-            )
+        if (volumePercent < alarmStreamVolumePercent && Build.VERSION.SDK_INT >= 28) {
+            ringtone.volume = volumePercent / alarmStreamVolumePercent
         }
-        // otherwise set the stream ringtone as best as we can
-        else {
-            am.setStreamVolume(
-                AudioManager.STREAM_ALARM,
-                (volume * am.getStreamMaxVolume(AudioManager.STREAM_ALARM)).toInt(),
-                AudioManager.FLAG_REMOVE_SOUND_AND_VIBRATE
-            )
+        else { // need to change the stream volume
+            // use ringtone volume if possible
+            if (Build.VERSION.SDK_INT >= 28) {
+                ringtone.volume = volumePercent
+                am.setStreamVolume(
+                    AudioManager.STREAM_ALARM,
+                    am.getStreamMaxVolume(AudioManager.STREAM_ALARM),
+                    AudioManager.FLAG_REMOVE_SOUND_AND_VIBRATE
+                )
+            }
+            // otherwise set the stream ringtone as best as we can
+            else {
+                am.setStreamVolume(
+                    AudioManager.STREAM_ALARM,
+                    (volumePercent * am.getStreamMaxVolume(AudioManager.STREAM_ALARM)).roundToInt(),
+                    AudioManager.FLAG_REMOVE_SOUND_AND_VIBRATE
+                )
+            }
+
+            // get media reference (to find duration of sound)
+            val media = MediaPlayer.create(this, sound)
+            Handler().postDelayed({
+                am.setStreamVolume(AudioManager.STREAM_ALARM, previousVolume, 0)
+            }, media.duration.toLong())
+            media.release()
         }
         ringtone.play()
-
-        // get media reference (to find duration of sound)
-        val media: MediaPlayer = MediaPlayer.create(applicationContext, sound) ?: return
-
-        // revert volume after ringtone has played
-        Handler().postDelayed({
-            am.setStreamVolume(AudioManager.STREAM_ALARM, previousVolume, 0)
-        }, media.duration.toLong())
-
-        // release media reference
-        media.release()
     }
 
     private fun playVibration(alertGroup: AlertGroup) {

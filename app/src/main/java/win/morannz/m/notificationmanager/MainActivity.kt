@@ -141,7 +141,7 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
-    fun navigate(destId: FragmentId, bundle: Bundle? = null): Boolean {
+    private fun navigate(destId: FragmentId, bundle: Bundle? = null): Boolean {
         // get destination fragment
         val destFragment = when (destId) {
             FragmentId.RECENTS -> RecentsFragment()
@@ -161,12 +161,13 @@ class MainActivity : AppCompatActivity(),
             else -> return false
         }
         // check whether to support the "back button"
-        val addToBackStack = when (destId) {
+        /*val addToBackStack = when (destId) {
             FragmentId.RECENTS,
             FragmentId.SELECTORS,
             FragmentId.ALERTS -> false
             else -> true
-        }
+        }*/
+        val addToBackStack = false
 
         // add any data to send
         destFragment.arguments = bundle

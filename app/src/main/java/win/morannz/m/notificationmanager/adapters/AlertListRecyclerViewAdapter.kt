@@ -12,11 +12,6 @@ import win.morannz.m.notificationmanager.AlertGroup
 import win.morannz.m.notificationmanager.R
 import win.morannz.m.notificationmanager.C
 
-/**
- * [RecyclerView.Adapter] that can display a [DummyItem] and makes a call to the
- * specified [OnListFragmentInteractionListener].
- * TODO: Replace the implementation with code for your data type.
- */
 class AlertListRecyclerViewAdapter(
     private val mValues: List<Pair<Int, AlertGroup>>,
     private val mListener: OnListFragmentInteractionListener?
@@ -26,8 +21,6 @@ class AlertListRecyclerViewAdapter(
 
     init {
         mOnClickListener = View.OnClickListener { v ->
-            // Notify the active callbacks interface (the activity, if the fragment is attached to
-            // one) that an item has been selected.
             mListener?.onListFragmentInteraction(C.ALERT_GROUP, v.tag)
         }
     }
@@ -56,7 +49,7 @@ class AlertListRecyclerViewAdapter(
         val mContentView: TextView = mView.text
 
         override fun toString(): String {
-            return super.toString() + " '" + mContentView.text + "'"
+            return "${super.toString()} '${mContentView.text}'"
         }
     }
 }

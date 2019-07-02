@@ -13,11 +13,6 @@ import kotlinx.android.synthetic.main.fragment_selector_list_item.view.*
 import win.morannz.m.notificationmanager.NotificationSelector
 import win.morannz.m.notificationmanager.fragments.SelectorsListFragment
 
-/**
- * [RecyclerView.Adapter] that can display a [DummyItem] and makes a call to the
- * specified [OnListFragmentInteractionListener].
- * TODO: Replace the implementation with code for your data type.
- */
 class SelectorListRecyclerViewAdapter(
     private val mValues: List<Pair<Int, NotificationSelector>>,
     private val mListener: OnListFragmentInteractionListener?
@@ -27,8 +22,6 @@ class SelectorListRecyclerViewAdapter(
 
     init {
         mOnClickListener = View.OnClickListener { v ->
-            // Notify the active callbacks interface (the activity, if the fragment is attached to
-            // one) that an item has been selected.
             mListener?.onListFragmentInteraction(C.NOTIFICATION_SELECTOR, v.tag)
         }
     }
@@ -57,7 +50,7 @@ class SelectorListRecyclerViewAdapter(
         val mContentView: TextView = mView.text
 
         override fun toString(): String {
-            return super.toString() + " '" + mContentView.text + "'"
+            return "${super.toString()} '${mContentView.text}'"
         }
     }
 }

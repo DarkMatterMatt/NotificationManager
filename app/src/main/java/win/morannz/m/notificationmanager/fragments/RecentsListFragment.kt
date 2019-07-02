@@ -2,9 +2,7 @@ package win.morannz.m.notificationmanager.fragments
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
@@ -13,30 +11,17 @@ import android.view.ViewGroup
 import win.morannz.m.notificationmanager.*
 import win.morannz.m.notificationmanager.adapters.RecentListRecyclerViewAdapter
 
-/**
- * A fragment representing a list of Items.
- * Activities containing this fragment MUST implement the
- * [RecentsListFragment.OnListFragmentInteractionListener] interface.
- */
 class RecentsListFragment : Fragment() {
+    private var mListener: OnListFragmentInteractionListener? = null
+    private var mListAdapter: RecentListRecyclerViewAdapter? = null
+    private var mRecentNotifications = mutableListOf<RecentNotification>()
 
-    // TODO: Customize parameters
-    private var columnCount = 1
-    private var listener: OnListFragmentInteractionListener? = null
-    private var listAdapter: RecentListRecyclerViewAdapter? = null
-    private var recentNotifications = mutableListOf<RecentNotification>()
-
-    fun refreshWithNewNotification(rn: RecentNotification) {
-        recentNotifications.add(0, rn)
-        recentNotifications.removeAt(C.MAX_NUMBER_OF_RECENT_NOTIFICATIONS)
-        listAdapter?.notifyDataSetChanged()
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        arguments?.let {
-            columnCount = it.getInt(ARG_COLUMN_COUNT)
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is OnListFragmentInteractionListener) {
+            mListener = context
+        } else {
+            throw RuntimeException("$context must implement OnListFragmentInteractionListener")
         }
     }
 
@@ -45,64 +30,31 @@ class RecentsListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_recent_list, container, false)
-        recentNotifications = getRecentNotifications(activity!!.applicationContext)
-        listAdapter = RecentListRecyclerViewAdapter(recentNotifications, listener)
+        mRecentNotifications = getRecentNotifications(context!!)
+        mListAdapter = RecentListRecyclerViewAdapter(mRecentNotifications, mListener)
 
-        // Set the adapter
+        // set the adapter
         if (view is RecyclerView) {
             with (view) {
-                layoutManager = when {
-                    columnCount <= 1 -> LinearLayoutManager(context)
-                    else -> GridLayoutManager(context, columnCount)
-                }
-                adapter = listAdapter
+                layoutManager = LinearLayoutManager(context)
+                adapter = mListAdapter
             }
         }
         return view
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        if (context is OnListFragmentInteractionListener) {
-            listener = context
-        } else {
-            throw RuntimeException(context.toString() + " must implement OnListFragmentInteractionListener")
-        }
-    }
-
     override fun onDetach() {
         super.onDetach()
-        listener = null
+        mListener = null
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     *
-     *
-     * See the Android Training lesson
-     * [Communicating with Other Fragments](http://developer.android.com/training/basics/fragments/communicating.html)
-     * for more information.
-     */
     interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
         fun onListFragmentInteraction(type: String, item: Any)
     }
 
-    companion object {
-
-        // TODO: Customize parameter argument names
-        const val ARG_COLUMN_COUNT = "column-count"
-
-        // TODO: Customize parameter initialization
-        @JvmStatic
-        fun newInstance(columnCount: Int) =
-            RecentsListFragment().apply {
-                arguments = Bundle().apply {
-                    putInt(ARG_COLUMN_COUNT, columnCount)
-                }
-            }
+    fun refreshWithNewNotification(rn: RecentNotification) {
+        mRecentNotifications.add(0, rn)
+        mRecentNotifications.removeAt(C.MAX_NUMBER_OF_RECENT_NOTIFICATIONS)
+        mListAdapter?.notifyDataSetChanged()
     }
 }
