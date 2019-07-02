@@ -29,7 +29,7 @@ class SelectorsListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_selector_list, container, false)
-        val notificationSelectors = getNotificationSelectors(activity!!.applicationContext)
+        val notificationSelectors = getNotificationSelectors(context!!)
 
         // set the adapter
         if (view is RecyclerView) {

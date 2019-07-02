@@ -9,9 +9,15 @@ import android.view.ViewGroup
 import kotlinx.android.synthetic.main.fragment_selectors.*
 import win.morannz.m.notificationmanager.C
 import win.morannz.m.notificationmanager.R
+import win.morannz.m.notificationmanager.getNotificationSelectorMaxIndex
+import win.morannz.m.notificationmanager.saveNotificationSelectorMaxIndex
 
 class SelectorsFragment : Fragment() {
     private var mListener: OnFragmentInteractionListener? = null
+
+    companion object {
+        fun newInstance() = SelectorsFragment()
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -33,7 +39,9 @@ class SelectorsFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         btn_add_selector.setOnClickListener {
-            mListener?.onFragmentInteraction(C.NEW_NOTIFICATION_SELECTOR, C.NO_DATA)
+            val newIndex = getNotificationSelectorMaxIndex(context!!) + 1
+            saveNotificationSelectorMaxIndex(context!!, newIndex)
+            mListener?.onFragmentInteraction(C.NOTIFICATION_SELECTOR, newIndex)
         }
     }
 

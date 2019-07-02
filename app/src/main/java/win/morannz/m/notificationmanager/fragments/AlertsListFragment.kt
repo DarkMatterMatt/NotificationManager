@@ -32,7 +32,7 @@ class AlertsListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_alert_list, container, false)
-        val alertGroups = getAlertGroups(activity!!.applicationContext)
+        val alertGroups = getAlertGroups(context!!)
 
         // set the adapter
         if (view is RecyclerView) {

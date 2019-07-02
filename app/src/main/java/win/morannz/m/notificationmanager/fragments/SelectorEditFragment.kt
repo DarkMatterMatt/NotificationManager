@@ -16,13 +16,22 @@ class SelectorEditFragment : Fragment() {
     private var mNsId: Int = -1
     private var mNs: NotificationSelector = NotificationSelector()
     private var mNsBackup: NotificationSelector = NotificationSelector()
-    private var mCreateNew: Boolean = false
     private var mListener: OnFragmentInteractionListener? = null
     private var mAlertGroups: MutableMap<Int, AlertGroup> = mutableMapOf()
     private var mAlertGroupsNameLookup: MutableMap<String, Int> = mutableMapOf()
     private var mNotificationSelectors: MutableMap<Int, NotificationSelector> = mutableMapOf()
     private var mPackages: MutableList<String> = mutableListOf()
     private var mTextWatchersEnabled: Boolean = true
+
+    companion object {
+        private const val NOTIFICATION_SELECTOR_ID = "notificationSelectorId"
+
+        fun newInstance(notificationSelectorId: Int) = SelectorEditFragment().apply {
+            arguments = Bundle().apply {
+                putInt(NOTIFICATION_SELECTOR_ID, notificationSelectorId)
+            }
+        }
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -36,8 +45,7 @@ class SelectorEditFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        mCreateNew = arguments?.getBoolean(C.NEW_NOTIFICATION_SELECTOR) ?: false
-        mNsId = arguments?.getInt(C.NOTIFICATION_SELECTOR, -1) ?: -1
+        mNsId = arguments!!.getInt(NOTIFICATION_SELECTOR_ID)
 
         // load list of notification selectors and packages
         mNotificationSelectors = getNotificationSelectors(context!!)

@@ -12,6 +12,10 @@ import win.morannz.m.notificationmanager.R
 class RecentsFragment : Fragment() {
     private var mListener: OnFragmentInteractionListener? = null
 
+    companion object {
+        fun newInstance() = RecentsFragment()
+    }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         if (context is OnFragmentInteractionListener) {

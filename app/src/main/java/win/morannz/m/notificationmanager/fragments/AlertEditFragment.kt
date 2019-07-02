@@ -24,11 +24,20 @@ class AlertEditFragment : Fragment() {
     private var mAgId: Int = -1
     private var mAg: AlertGroup = AlertGroup()
     private var mAgBackup: AlertGroup = AlertGroup()
-    private var mCreateNew: Boolean = false
     private var mListener: OnFragmentInteractionListener? = null
     private var mAlertGroups = mutableMapOf<Int, AlertGroup>()
     private var mTextWatchersEnabled: Boolean = true
     private var mRelativeVolumeStreams = mutableMapOf<String, Int>()
+
+    companion object {
+        private const val ALERT_GROUP_ID = "alertGroupId"
+
+        fun newInstance(alertGroupId: Int) = AlertEditFragment().apply {
+            arguments = Bundle().apply {
+                putInt(ALERT_GROUP_ID, alertGroupId)
+            }
+        }
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -41,8 +50,7 @@ class AlertEditFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mCreateNew = arguments?.getBoolean(C.NEW_ALERT_GROUP) ?: false
-        mAgId = arguments?.getInt(C.ALERT_GROUP, -1) ?: -1
+        mAgId = arguments!!.getInt(ALERT_GROUP_ID)
         mAlertGroups = getAlertGroups(context!!)
         mAg = mAlertGroups[mAgId] ?: AlertGroup()
 
@@ -74,7 +82,6 @@ class AlertEditFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_alert_edit, container, false)
     }
 
-
     override fun onStart() {
         super.onStart()
 
@@ -83,7 +90,7 @@ class AlertEditFragment : Fragment() {
 
         // add options for alertGroup dropdown
         val relativeVolumeStreamAdapter = ArrayAdapter(
-            activity!!.applicationContext,
+            context!!,
             android.R.layout.simple_dropdown_item_1line,
             mRelativeVolumeStreams.keys.toList()
         )
@@ -139,7 +146,7 @@ class AlertEditFragment : Fragment() {
             if (mTextWatchersEnabled) {
                 mAg.alertWhenScreenOn = isChecked
                 mAlertGroups[mAgId] = mAg
-                saveAlertGroups(activity!!.applicationContext, mAlertGroups)
+                saveAlertGroups(context!!, mAlertGroups)
             }
         }
         alert_edit_absolute_volume.setOnCheckedChangeListener { _, isChecked ->
@@ -208,7 +215,7 @@ class AlertEditFragment : Fragment() {
                 if (uri != null) {
                     mAg.soundUri = uri.toString()
                     mAlertGroups[mAgId] = mAg
-                    saveAlertGroups(activity!!.applicationContext, mAlertGroups)
+                    saveAlertGroups(context!!, mAlertGroups)
                 }
             }
             if (resultCode == Activity.RESULT_CANCELED) {

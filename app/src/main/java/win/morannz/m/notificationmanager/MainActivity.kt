@@ -20,6 +20,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.IntentFilter
 import android.util.Log
+import androidx.fragment.app.Fragment
 import kotlinx.serialization.json.Json
 
 
@@ -53,17 +54,19 @@ class MainActivity : AppCompatActivity(),
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener {
         navigate(
             when (it.itemId) {
-                R.id.navigation_recents -> FragmentId.RECENTS
-                R.id.navigation_selectors -> FragmentId.SELECTORS
-                R.id.navigation_alerts -> FragmentId.ALERTS
+                R.id.navigation_recents -> RecentsFragment.newInstance()
+                R.id.navigation_selectors -> SelectorsFragment.newInstance()
+                R.id.navigation_alerts -> AlertsFragment.newInstance()
                 else -> return@OnNavigationItemSelectedListener false
             }
         )
+        true
     }
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.action_settings -> {
-            navigate(FragmentId.SETTINGS)
+            //navigate(FragmentId.SETTINGS)
+            true
         }
         else -> {
             // If we got here, the user's action was not recognized.
@@ -83,7 +86,7 @@ class MainActivity : AppCompatActivity(),
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
-        navigate(FragmentId.RECENTS)
+        navigate(RecentsFragment.newInstance(), R.string.title_recents)
 
         // prompt user to enable the notification listener service
         if (!isNotificationServiceEnabled()) {
@@ -110,38 +113,33 @@ class MainActivity : AppCompatActivity(),
 
     override fun onFragmentInteraction(type: String, data: Any) {
         when (type) {
-            C.NEW_NOTIFICATION_SELECTOR -> {
-                var maxIndex = getNotificationSelectorMaxIndex(this)
-                saveNotificationSelectorMaxIndex(this, ++maxIndex)
-
-                val b = Bundle()
-                b.putBoolean(C.NEW_NOTIFICATION_SELECTOR, true)
-                b.putInt(C.NOTIFICATION_SELECTOR, maxIndex)
-                navigate(FragmentId.SELECTOR_EDIT, b)
-            }
             C.NOTIFICATION_SELECTOR -> {
-                val b = Bundle()
-                b.putInt(C.NOTIFICATION_SELECTOR, data as Int)
-                navigate(FragmentId.SELECTOR_EDIT, b)
-            }
-            C.NEW_ALERT_GROUP -> {
-                var maxIndex = getAlertGroupMaxIndex(this)
-                saveAlertGroupMaxIndex(this, ++maxIndex)
-
-                val b = Bundle()
-                b.putBoolean(C.NEW_NOTIFICATION_SELECTOR, true)
-                b.putInt(C.ALERT_GROUP, maxIndex)
-                navigate(FragmentId.ALERT_EDIT, b)
+                val destFragment = SelectorEditFragment.newInstance(data as Int)
+                navigate(destFragment, R.string.title_selectors)
             }
             C.ALERT_GROUP -> {
-                val b = Bundle()
-                b.putInt(C.ALERT_GROUP, data as Int)
-                navigate(FragmentId.ALERT_EDIT, b)
+                val destFragment = AlertEditFragment.newInstance(data as Int)
+                navigate(destFragment, R.string.title_alerts)
             }
         }
     }
 
-    private fun navigate(destId: FragmentId, bundle: Bundle? = null): Boolean {
+    private fun navigate(destFragment: Fragment, destTitle: Int? = null) {
+        val addToBackStack = false
+
+        // perform fragment swap
+        val t = supportFragmentManager.beginTransaction()
+        if (addToBackStack) {
+            t.addToBackStack(null)
+        }
+        t.replace(R.id.fragment, destFragment)
+        t.commit()
+
+        // change the title
+        if (destTitle !== null) setTitle(destTitle)
+    }
+
+    private fun navigateOld(destId: FragmentId, bundle: Bundle? = null): Boolean {
         // get destination fragment
         val destFragment = when (destId) {
             FragmentId.RECENTS -> RecentsFragment()
