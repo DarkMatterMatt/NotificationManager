@@ -214,6 +214,7 @@ class AlertEditFragment : Fragment() {
                 val uri: Uri? = data?.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
                 if (uri != null) {
                     mAg.soundUri = uri.toString()
+                    alert_edit_sound_uri.setText(mAg.soundUri)
                     mAlertGroups[mAgId] = mAg
                     saveAlertGroups(context!!, mAlertGroups)
                 }
