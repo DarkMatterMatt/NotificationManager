@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -109,22 +110,24 @@ class AlertEditFragment : Fragment() {
         fun onFragmentInteraction(type: String, data: Any)
     }
 
-    private fun EditText.saveAfterTextChanged(afterTextChanged: (String) -> Unit) {
+    private fun Boolean.toInt() = if (this) 1 else 0
+
+    private fun EditText.afterTextChanged(afterTextChanged: (String) -> Unit) {
         this.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun afterTextChanged(editable: Editable?) {
-                if (mTextWatchersEnabled) {
-                    afterTextChanged.invoke(editable.toString())
-                    save()
-                }
+                applyChanges { afterTextChanged(editable.toString()) }
             }
         })
     }
 
-    private fun save() {
-        mAlertGroups[mAgId] = mAg
-        saveAlertGroups(context!!, mAlertGroups)
+    private fun applyChanges(applyChange: () -> Unit) {
+        if (mTextWatchersEnabled) {
+            applyChange()
+            mAlertGroups[mAgId] = mAg
+            saveAlertGroups(context!!, mAlertGroups)
+        }
     }
 
     private fun getRelativeVolumeStreamString(stream: Int): String {
@@ -137,46 +140,37 @@ class AlertEditFragment : Fragment() {
     }
 
     private fun registerWatchers() {
-        alert_edit_name.saveAfterTextChanged { mAg.name = it }
-        alert_edit_comment.saveAfterTextChanged { mAg.comment = it }
-        alert_edit_min_secs_between_alerts.saveAfterTextChanged { if (it != "") mAg.minSecsBetweenAlerts = it.toInt() }
+        alert_edit_name.afterTextChanged { mAg.name = it }
+        alert_edit_comment.afterTextChanged { mAg.comment = it }
+        alert_edit_min_secs_between_alerts.afterTextChanged { if (it != "") mAg.minSecsBetweenAlerts = it.toInt() }
         alert_edit_sound_uri.setOnClickListener { selectSoundUri() }
-        alert_edit_vibration_pattern.saveAfterTextChanged { mAg.vibrationPattern = it }
+        alert_edit_vibration_pattern.afterTextChanged { mAg.vibrationPattern = it }
         alert_edit_alert_when_screen_on.setOnCheckedChangeListener { _, isChecked ->
-            if (mTextWatchersEnabled) {
-                mAg.alertWhenScreenOn = isChecked
-                mAlertGroups[mAgId] = mAg
-                saveAlertGroups(context!!, mAlertGroups)
-            }
+            applyChanges { mAg.alertWhenScreenOn = isChecked }
         }
         alert_edit_absolute_volume.setOnCheckedChangeListener { _, isChecked ->
-            if (mTextWatchersEnabled) {
-                mAg.absoluteVolume = isChecked
-                save()
-            }
+            applyChanges { mAg.absoluteVolume = isChecked }
         }
-        alert_edit_volume_percent.saveAfterTextChanged { if (it != "") mAg.volumePercent = it.toInt() }
+        alert_edit_volume_percent.afterTextChanged { if (it != "") mAg.volumePercent = it.toInt() }
         alert_edit_sound_ringer_modes_group.addOnButtonCheckedListener { _, _, _ ->
-            if (mTextWatchersEnabled) {
-                var x = 0
-                if (alert_edit_sound_ringer_mode_silent.isChecked) x += RingerMode.SILENT
-                if (alert_edit_sound_ringer_mode_vibrate.isChecked) x += RingerMode.VIBRATE
-                if (alert_edit_sound_ringer_mode_normal.isChecked) x += RingerMode.NORMAL
-                mAg.soundRingerModes = x
-                save()
+            applyChanges {
+                mAg.vibrationRingerModes = (0
+                        + alert_edit_sound_ringer_mode_silent.isChecked.toInt() * RingerMode.SILENT
+                        + alert_edit_sound_ringer_mode_vibrate.isChecked.toInt() * RingerMode.VIBRATE
+                        + alert_edit_sound_ringer_mode_normal.isChecked.toInt() * RingerMode.NORMAL)
             }
         }
         alert_edit_vibration_ringer_modes_group.addOnButtonCheckedListener { _, _, _ ->
-            if (mTextWatchersEnabled) {
-                var x = 0
-                if (alert_edit_vibration_ringer_mode_silent.isChecked) x += RingerMode.SILENT
-                if (alert_edit_vibration_ringer_mode_vibrate.isChecked) x += RingerMode.VIBRATE
-                if (alert_edit_vibration_ringer_mode_normal.isChecked) x += RingerMode.NORMAL
-                mAg.vibrationRingerModes = x
-                save()
+            applyChanges {
+                mAg.vibrationRingerModes = (0
+                        + alert_edit_vibration_ringer_mode_silent.isChecked.toInt() * RingerMode.SILENT
+                        + alert_edit_vibration_ringer_mode_vibrate.isChecked.toInt() * RingerMode.VIBRATE
+                        + alert_edit_vibration_ringer_mode_normal.isChecked.toInt() * RingerMode.NORMAL)
             }
         }
-        alert_edit_relative_volume_stream.saveAfterTextChanged { mAg.relativeVolumeStream = mRelativeVolumeStreams[it] ?: AudioManager.STREAM_NOTIFICATION }
+        alert_edit_relative_volume_stream.afterTextChanged {
+            mAg.relativeVolumeStream = mRelativeVolumeStreams[it] ?: AudioManager.STREAM_NOTIFICATION
+        }
     }
 
     private fun populateFields(ag: AlertGroup) {
@@ -202,7 +196,7 @@ class AlertEditFragment : Fragment() {
     private fun selectSoundUri() {
         val i = Intent(RingtoneManager.ACTION_RINGTONE_PICKER)
             //.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select ringtone for notifications:")
-            //.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false)
+            .putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, true)
             //.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
             .putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION)
         startActivityForResult(i, RequestCode.SOUND_URI)
@@ -212,12 +206,10 @@ class AlertEditFragment : Fragment() {
         if (requestCode == RequestCode.SOUND_URI) {
             if (resultCode == Activity.RESULT_OK) {
                 val uri: Uri? = data?.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
-                if (uri != null) {
-                    mAg.soundUri = uri.toString()
-                    alert_edit_sound_uri.setText(mAg.soundUri)
-                    mAlertGroups[mAgId] = mAg
-                    saveAlertGroups(context!!, mAlertGroups)
-                }
+                mAg.soundUri = uri?.toString()
+                alert_edit_sound_uri.setText(mAg.soundUri)
+                mAlertGroups[mAgId] = mAg
+                saveAlertGroups(context!!, mAlertGroups)
             }
             if (resultCode == Activity.RESULT_CANCELED) {
                 //Write your code if there's no result
