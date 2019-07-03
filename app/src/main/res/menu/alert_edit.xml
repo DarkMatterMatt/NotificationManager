@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-            android:id="@+id/action_selector_edit_cancel_edit"
+            android:id="@+id/action_alert_edit_cancel_edit"
             android:icon="@drawable/ic_menu_restore_black_24dp"
-            android:title="@string/selector_edit_cancel_edit"
+            android:title="@string/alert_edit_cancel_edit"
             app:showAsAction="ifRoom"/>
     <item
-            android:id="@+id/action_selector_edit_delete"
+            android:id="@+id/action_alert_edit_delete"
             android:icon="@drawable/ic_menu_delete_black_24dp"
-            android:title="@string/selector_edit_delete"
+            android:title="@string/alert_edit_delete"
             app:showAsAction="ifRoom"/>
 </menu>

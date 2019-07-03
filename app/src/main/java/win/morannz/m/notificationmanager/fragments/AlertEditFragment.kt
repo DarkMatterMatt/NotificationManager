@@ -9,9 +9,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import androidx.fragment.app.Fragment
@@ -103,6 +101,20 @@ class AlertEditFragment : Fragment() {
     override fun onDetach() {
         super.onDetach()
         mListener = null
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.alert_edit, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // handle item selection
+        when (item.itemId) {
+            R.id.action_alert_edit_cancel_edit -> return cancelEdit()
+            R.id.action_alert_edit_delete -> return deleteSelector()
+            else -> return super.onOptionsItemSelected(item)
+        }
     }
 
     interface OnFragmentInteractionListener {
@@ -214,5 +226,20 @@ class AlertEditFragment : Fragment() {
                 //Write your code if there's no result
             }
         }
+    }
+
+    private fun cancelEdit(): Boolean {
+        populateFields(mAgBackup)
+        mAg = Json.parse(AlertGroup.serializer(), Json.stringify(AlertGroup.serializer(), mAgBackup))
+        mAlertGroups[mAgId] = mAg
+        saveAlertGroups(context!!, mAlertGroups)
+        return true
+    }
+
+    private fun deleteSelector(): Boolean {
+        mAlertGroups.remove(mAgId)
+        saveAlertGroups(context!!, mAlertGroups)
+        activity!!.onBackPressed()
+        return true
     }
 }
