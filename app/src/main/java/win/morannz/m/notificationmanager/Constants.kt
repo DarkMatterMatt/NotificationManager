@@ -7,10 +7,6 @@ object C {
     const val RECENT_NOTIFICATION   = "RN"
     const val NOTIFICATION_SELECTOR = "NS"
     const val ALERT_GROUP           = "AG"
-    const val MAX_INDEX       = "maxIndex"
-    const val LAST_ALERT_TIME = "lastAlertTime"
-    const val PACKAGES_WITH_NOTIFICATIONS = "PN"
-    val PACKAGES_WITH_NOTIFICATIONS_EXCLUDE_LIST = listOf("android")
 }
 
 object RequestCode {
