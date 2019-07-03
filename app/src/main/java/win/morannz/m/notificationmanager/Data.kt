@@ -5,10 +5,11 @@ import android.content.Context
 import android.media.AudioManager
 import android.preference.PreferenceManager
 import android.service.notification.StatusBarNotification
-import android.util.Log
-import kotlinx.serialization.*
-import kotlinx.serialization.json.Json
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.internal.IntSerializer
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.list
+import kotlinx.serialization.map
 
 /*
  *  NotificationSelectors (NS) and AlertGroups (AG) stored as a map of IntegerId -> NS/AG

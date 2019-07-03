@@ -1,7 +1,6 @@
 package win.morannz.m.notificationmanager
 
-import android.content.ComponentName
-import android.content.Intent
+import android.content.*
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -11,17 +10,13 @@ import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.activity_main.*
-import win.morannz.m.notificationmanager.fragments.*
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.IntentFilter
-import android.util.Log
-import androidx.fragment.app.Fragment
 import kotlinx.serialization.json.Json
+import win.morannz.m.notificationmanager.fragments.*
 
 
 class MainActivity : AppCompatActivity(),
@@ -44,7 +39,6 @@ class MainActivity : AppCompatActivity(),
                 val rn = Json.parse(RecentNotification.serializer(), rnString)
                 val fragment = supportFragmentManager.findFragmentById(R.id.fragment)?.childFragmentManager?.findFragmentById(R.id.fragment_recent_list)
                 if (fragment !== null && fragment is RecentsListFragment) {
-                    Log.d(C.TAG, "Refresh recents list")
                     fragment.refreshWithNewNotification(rn)
                 }
             }
@@ -86,7 +80,7 @@ class MainActivity : AppCompatActivity(),
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
-        navigate(RecentsFragment.newInstance(), R.string.title_recents)
+        navigate(RecentsFragment.newInstance(), R.string.title_notification_manager)
 
         // prompt user to enable the notification listener service
         if (!isNotificationServiceEnabled()) {
@@ -137,50 +131,6 @@ class MainActivity : AppCompatActivity(),
 
         // change the title
         if (destTitle !== null) setTitle(destTitle)
-    }
-
-    private fun navigateOld(destId: FragmentId, bundle: Bundle? = null): Boolean {
-        // get destination fragment
-        val destFragment = when (destId) {
-            FragmentId.RECENTS -> RecentsFragment()
-            FragmentId.SELECTORS -> SelectorsFragment()
-            FragmentId.SELECTOR_EDIT -> SelectorEditFragment()
-            FragmentId.ALERTS -> AlertsFragment()
-            FragmentId.ALERT_EDIT -> AlertEditFragment()
-            else -> return false
-        }
-        // get destination title
-        val destTitle = when (destId) {
-            FragmentId.RECENTS -> R.string.title_recents
-            FragmentId.SELECTORS -> R.string.title_selectors
-            FragmentId.SELECTOR_EDIT -> R.string.title_selector_edit
-            FragmentId.ALERTS -> R.string.title_alerts
-            FragmentId.ALERT_EDIT -> R.string.title_alert_edit
-            else -> return false
-        }
-        // check whether to support the "back button"
-        /*val addToBackStack = when (destId) {
-            FragmentId.RECENTS,
-            FragmentId.SELECTORS,
-            FragmentId.ALERTS -> false
-            else -> true
-        }*/
-        val addToBackStack = false
-
-        // add any data to send
-        destFragment.arguments = bundle
-
-        // perform fragment swap
-        val t = supportFragmentManager.beginTransaction()
-        if (addToBackStack) {
-            t.addToBackStack(null)
-        }
-        t.replace(R.id.fragment, destFragment)
-        t.commit()
-
-        // change the title
-        setTitle(destTitle)
-        return true
     }
 
     private fun restartNotificationService() {
