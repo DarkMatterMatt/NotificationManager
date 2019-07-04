@@ -9,8 +9,7 @@ import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_alerts.*
 import win.morannz.m.notificationmanager.BuildConfig
 import win.morannz.m.notificationmanager.R
-import win.morannz.m.notificationmanager.getAlertGroupMaxIndex
-import win.morannz.m.notificationmanager.saveAlertGroupMaxIndex
+import win.morannz.m.notificationmanager.getAlertGroupNewIndex
 
 class AlertsFragment : Fragment() {
     companion object {
@@ -43,8 +42,7 @@ class AlertsFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         btn_add_alert.setOnClickListener {
-            val newIndex = getAlertGroupMaxIndex(context!!) + 1
-            saveAlertGroupMaxIndex(context!!, newIndex)
+            val newIndex = getAlertGroupNewIndex(context!!)
             mListener?.onFragmentInteraction(INTERACTION, newIndex)
         }
     }

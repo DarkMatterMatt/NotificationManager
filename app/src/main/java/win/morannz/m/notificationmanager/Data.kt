@@ -96,15 +96,13 @@ fun saveNotificationSelectors(context: Context, notificationSelectors: MutableMa
     e.putString(NOTIFICATION_SELECTORS, nsString)
     e.apply()
 }
-fun getNotificationSelectorMaxIndex(context: Context) : Int {
-    val p = PreferenceManager.getDefaultSharedPreferences(context)
-    return p.getInt(NOTIFICATION_SELECTORS_MAX_INDEX, -1)
-}
-fun saveNotificationSelectorMaxIndex(context: Context, maxIndex: Int) {
+fun getNotificationSelectorNewIndex(context: Context) : Int {
     val p = PreferenceManager.getDefaultSharedPreferences(context)
     val e = p.edit()
-    e.putInt(NOTIFICATION_SELECTORS_MAX_INDEX, maxIndex)
+    val newIndex = p.getInt(NOTIFICATION_SELECTORS_MAX_INDEX, -1) + 1
+    e.putInt(NOTIFICATION_SELECTORS_MAX_INDEX, newIndex)
     e.apply()
+    return newIndex
 }
 fun getNotificationSelectorLastAlertTime(context: Context, id: Int) : Long {
     val p = PreferenceManager.getDefaultSharedPreferences(context)
@@ -134,15 +132,13 @@ fun saveAlertGroups(context: Context, alertGroups: MutableMap<Int, AlertGroup>) 
     e.putString(ALERT_GROUPS, agString)
     e.apply()
 }
-fun getAlertGroupMaxIndex(context: Context) : Int {
-    val p = PreferenceManager.getDefaultSharedPreferences(context)
-    return p.getInt(ALERT_GROUPS_MAX_INDEX, -1)
-}
-fun saveAlertGroupMaxIndex(context: Context, maxIndex: Int) {
+fun getAlertGroupNewIndex(context: Context) : Int {
     val p = PreferenceManager.getDefaultSharedPreferences(context)
     val e = p.edit()
-    e.putInt(ALERT_GROUPS_MAX_INDEX, maxIndex)
+    val newIndex = p.getInt(ALERT_GROUPS_MAX_INDEX, -1) + 1
+    e.putInt(ALERT_GROUPS_MAX_INDEX, newIndex)
     e.apply()
+    return newIndex
 }
 fun getAlertGroupLastAlertTime(context: Context, id: Int) : Long {
     val p = PreferenceManager.getDefaultSharedPreferences(context)
