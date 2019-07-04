@@ -28,6 +28,7 @@ class AlertEditFragment : Fragment() {
     private var mRelativeVolumeStreams = mutableMapOf<String, Int>()
 
     companion object {
+        private val TAG = this::class.java.simpleName
         private const val ALERT_GROUP_ID = "alertGroupId"
 
         fun newInstance(alertGroupId: Int) = AlertEditFragment().apply {

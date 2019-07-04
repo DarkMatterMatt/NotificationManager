@@ -14,9 +14,11 @@ import android.service.notification.StatusBarNotification
 import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import kotlinx.serialization.json.Json
+import win.morannz.m.notificationmanager.fragments.RecentsFragment
 import kotlin.math.roundToInt
 
 class NotificationManagerService : NotificationListenerService() {
+    private val TAG = this::class.java.simpleName
     private var mLastNotificationKey = ""
     private var lastNotificationTime = 0L
 
@@ -25,7 +27,7 @@ class NotificationManagerService : NotificationListenerService() {
         if (sbn.key == mLastNotificationKey && System.currentTimeMillis() < lastNotificationTime + 100) return
         mLastNotificationKey = sbn.key
         lastNotificationTime = System.currentTimeMillis()
-        Log.d(C.TAG, "Notification posted: ${sbn.key}")
+        Log.d(TAG, "Notification posted: ${sbn.key}")
 
         // save notification
         val recentNotifications = getRecentNotifications(this)
@@ -35,8 +37,8 @@ class NotificationManagerService : NotificationListenerService() {
         recordPackageWithNotifications(this, sbn.packageName)
 
         // refresh recents list if open
-        val i = Intent(C.REFRESH_RECENTS_LIST_INTENT)
-        i.putExtra(C.RECENT_NOTIFICATION, Json.stringify(RecentNotification.serializer(), rn))
+        val i = Intent(RecentsFragment.INTENT_UPDATE)
+        i.putExtra(RecentsFragment.UPDATE_DATA, Json.stringify(RecentNotification.serializer(), rn))
         LocalBroadcastManager.getInstance(this).sendBroadcast(i)
 
         // find & play alert group
@@ -118,7 +120,7 @@ class NotificationManagerService : NotificationListenerService() {
     }
 
     private fun playSound(alertGroup: AlertGroup) {
-        val sound = Uri.parse(alertGroup.soundUri) ?: return
+        val sound = Uri.parse(alertGroup.soundUri ?: return) ?: return
         val am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
         // only alert for enabled ringer modes

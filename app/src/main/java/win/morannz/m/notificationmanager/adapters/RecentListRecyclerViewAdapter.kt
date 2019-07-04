@@ -1,18 +1,18 @@
 package win.morannz.m.notificationmanager.adapters
 
-import androidx.recyclerview.widget.RecyclerView
+import android.content.pm.PackageManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import win.morannz.m.notificationmanager.fragments.RecentsListFragment.OnListFragmentInteractionListener
-import kotlinx.android.synthetic.main.fragment_recent_list_item.view.*
-import win.morannz.m.notificationmanager.C
-import win.morannz.m.notificationmanager.RecentNotification
-import win.morannz.m.notificationmanager.R
-import android.content.pm.PackageManager
-import android.util.Log
 import android.widget.ImageView
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import kotlinx.android.synthetic.main.fragment_recent_list_item.view.*
+import win.morannz.m.notificationmanager.R
+import win.morannz.m.notificationmanager.RecentNotification
+import win.morannz.m.notificationmanager.fragments.RecentsFragment
+import win.morannz.m.notificationmanager.fragments.RecentsListFragment.OnListFragmentInteractionListener
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -20,12 +20,15 @@ class RecentListRecyclerViewAdapter(
     private val mValues: List<RecentNotification>,
     private val mListener: OnListFragmentInteractionListener?
 ) : RecyclerView.Adapter<RecentListRecyclerViewAdapter.ViewHolder>() {
+    companion object {
+        private val TAG = this::class.java.simpleName
+    }
 
     private val mOnClickListener: View.OnClickListener
 
     init {
         mOnClickListener = View.OnClickListener { v ->
-            mListener?.onListFragmentInteraction(C.RECENT_NOTIFICATION, v.tag)
+            mListener?.onListFragmentInteraction(RecentsFragment.INTERACTION, v.tag)
         }
     }
 
@@ -50,7 +53,7 @@ class RecentListRecyclerViewAdapter(
             val icon = holder.mPackageIconView.context.packageManager.getApplicationIcon(item.packageName)
             holder.mPackageIconView.setImageDrawable(icon)
         } catch (e: PackageManager.NameNotFoundException) {
-            Log.e(C.TAG, "Caught PackageManager.NameNotFoundException for " + item.packageName)
+            Log.e(TAG, "Caught PackageManager.NameNotFoundException for " + item.packageName)
         }
 
         with (holder.mView) {

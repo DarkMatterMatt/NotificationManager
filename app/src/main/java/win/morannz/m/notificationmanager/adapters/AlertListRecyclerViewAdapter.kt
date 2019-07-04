@@ -1,27 +1,29 @@
 package win.morannz.m.notificationmanager.adapters
 
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import win.morannz.m.notificationmanager.fragments.AlertsListFragment.OnListFragmentInteractionListener
-
+import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_alert_list_item.view.*
 import win.morannz.m.notificationmanager.AlertGroup
 import win.morannz.m.notificationmanager.R
-import win.morannz.m.notificationmanager.C
+import win.morannz.m.notificationmanager.fragments.AlertsFragment
+import win.morannz.m.notificationmanager.fragments.AlertsListFragment.OnListFragmentInteractionListener
 
 class AlertListRecyclerViewAdapter(
     private val mValues: List<Pair<Int, AlertGroup>>,
     private val mListener: OnListFragmentInteractionListener?
 ) : RecyclerView.Adapter<AlertListRecyclerViewAdapter.ViewHolder>() {
+    companion object {
+        private val TAG = this::class.java.simpleName
+    }
 
     private val mOnClickListener: View.OnClickListener
 
     init {
         mOnClickListener = View.OnClickListener { v ->
-            mListener?.onListFragmentInteraction(C.ALERT_GROUP, v.tag)
+            mListener?.onListFragmentInteraction(AlertsFragment.INTERACTION, v.tag)
         }
     }
 

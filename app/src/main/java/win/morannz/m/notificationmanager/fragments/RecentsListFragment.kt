@@ -2,16 +2,23 @@ package win.morannz.m.notificationmanager.fragments
 
 import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import win.morannz.m.notificationmanager.*
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import win.morannz.m.notificationmanager.C
+import win.morannz.m.notificationmanager.R
+import win.morannz.m.notificationmanager.RecentNotification
 import win.morannz.m.notificationmanager.adapters.RecentListRecyclerViewAdapter
+import win.morannz.m.notificationmanager.getRecentNotifications
 
 class RecentsListFragment : Fragment() {
+    companion object {
+        private val TAG = this::class.java.simpleName
+    }
+
     private var mListener: OnListFragmentInteractionListener? = null
     private var mListAdapter: RecentListRecyclerViewAdapter? = null
     private var mRecentNotifications = mutableListOf<RecentNotification>()
@@ -52,9 +59,9 @@ class RecentsListFragment : Fragment() {
         fun onListFragmentInteraction(type: String, item: Any)
     }
 
-    fun refreshWithNewNotification(rn: RecentNotification) {
+    fun updateList(rn: RecentNotification) {
         mRecentNotifications.add(0, rn)
-        mRecentNotifications.removeAt(C.MAX_NUMBER_OF_RECENT_NOTIFICATIONS)
+        mRecentNotifications = mRecentNotifications.take(C.MAX_NUMBER_OF_RECENT_NOTIFICATIONS).toMutableList()
         mListAdapter?.notifyDataSetChanged()
     }
 }

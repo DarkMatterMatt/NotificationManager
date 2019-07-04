@@ -32,14 +32,14 @@ class MainActivity : AppCompatActivity(),
 
     private var localBroadcastManager : LocalBroadcastManager? = null
 
-    private val broadcastReciever = object : BroadcastReceiver() {
+    private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action == C.REFRESH_RECENTS_LIST_INTENT) {
-                val rnString = intent.getStringExtra(C.RECENT_NOTIFICATION)
+            if (intent.action == RecentsFragment.INTENT_UPDATE) {
+                val rnString = intent.getStringExtra(RecentsFragment.UPDATE_DATA)
                 val rn = Json.parse(RecentNotification.serializer(), rnString)
                 val fragment = supportFragmentManager.findFragmentById(R.id.fragment)?.childFragmentManager?.findFragmentById(R.id.fragment_recent_list)
                 if (fragment !== null && fragment is RecentsListFragment) {
-                    fragment.refreshWithNewNotification(rn)
+                    fragment.updateList(rn)
                 }
             }
         }
@@ -90,14 +90,14 @@ class MainActivity : AppCompatActivity(),
         restartNotificationService()
 
         localBroadcastManager = LocalBroadcastManager.getInstance(this)
-        val intentFilter = IntentFilter()
-        intentFilter.addAction(C.REFRESH_RECENTS_LIST_INTENT)
-        localBroadcastManager?.registerReceiver(broadcastReciever, intentFilter)
+        localBroadcastManager?.registerReceiver(broadcastReceiver, IntentFilter().apply {
+            addAction(RecentsFragment.INTENT_UPDATE)
+        })
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        localBroadcastManager?.unregisterReceiver(broadcastReciever);
+        localBroadcastManager?.unregisterReceiver(broadcastReceiver);
     }
 
     override fun onListFragmentInteraction(type: String, item: Any) {
@@ -107,11 +107,11 @@ class MainActivity : AppCompatActivity(),
 
     override fun onFragmentInteraction(type: String, data: Any) {
         when (type) {
-            C.NOTIFICATION_SELECTOR -> {
+            SelectorsFragment.INTERACTION -> {
                 val destFragment = SelectorEditFragment.newInstance(data as Int)
                 navigate(destFragment, R.string.title_selectors)
             }
-            C.ALERT_GROUP -> {
+            AlertsFragment.INTERACTION -> {
                 val destFragment = AlertEditFragment.newInstance(data as Int)
                 navigate(destFragment, R.string.title_alerts)
             }
@@ -126,7 +126,7 @@ class MainActivity : AppCompatActivity(),
         if (addToBackStack) {
             t.addToBackStack(null)
         }
-        t.replace(R.id.fragment, destFragment)
+        t.replace(R.id.fragment, destFragment, destFragment::class.java.canonicalName)
         t.commit()
 
         // change the title
@@ -184,15 +184,16 @@ class MainActivity : AppCompatActivity(),
      * @return An alert dialog which leads to the notification enabling screen
      */
     private fun showNotificationServiceAlertDialog() {
-        MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.notification_listener_service)
-            .setMessage(R.string.notification_listener_service_explanation)
-            .setPositiveButton(R.string.yes) { _, _ -> startActivity(Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS")) }
-            .setNegativeButton(R.string.no) { dialog, id ->
+        MaterialAlertDialogBuilder(this).apply {
+            setTitle(R.string.notification_listener_service)
+            setMessage(R.string.notification_listener_service_explanation)
+            setPositiveButton(R.string.yes) { _, _ -> startActivity(Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS")) }
+            setNegativeButton(R.string.no) { dialog, id ->
                 // If you choose to not enable the notification listener
                 // the app. will not work as expected
             }
-            .show()
+            show()
+        }
     }
 
     /*private fun notificationListenerServiceIsRunning(): Boolean {

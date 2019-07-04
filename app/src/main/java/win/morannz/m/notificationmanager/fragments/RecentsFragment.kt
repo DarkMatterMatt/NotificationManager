@@ -2,11 +2,11 @@ package win.morannz.m.notificationmanager.fragments
 
 import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import win.morannz.m.notificationmanager.C
+import androidx.fragment.app.Fragment
+import win.morannz.m.notificationmanager.BuildConfig
 import win.morannz.m.notificationmanager.R
 
 class RecentsFragment : Fragment() {
@@ -14,6 +14,12 @@ class RecentsFragment : Fragment() {
 
     companion object {
         fun newInstance() = RecentsFragment()
+        private val TAG = this::class.java.simpleName
+
+        private const val ME = "${BuildConfig.APPLICATION_ID}.RecentsFragment"
+        const val INTENT_UPDATE = "$ME.INTENT_UPDATE"
+        const val UPDATE_DATA = "$ME.UPDATE_DATA"
+        const val INTERACTION = "$ME.INTERACTION"
     }
 
     override fun onAttach(context: Context) {

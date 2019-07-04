@@ -13,6 +13,10 @@ import win.morannz.m.notificationmanager.adapters.SelectorListRecyclerViewAdapte
 import win.morannz.m.notificationmanager.getNotificationSelectors
 
 class SelectorsListFragment : Fragment() {
+    companion object {
+        private val TAG = this::class.java.simpleName
+    }
+
     private var mListener: OnListFragmentInteractionListener? = null
 
     override fun onAttach(context: Context) {

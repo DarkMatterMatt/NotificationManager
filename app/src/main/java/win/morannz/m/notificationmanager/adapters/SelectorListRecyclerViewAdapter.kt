@@ -1,28 +1,29 @@
 package win.morannz.m.notificationmanager.adapters
 
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import win.morannz.m.notificationmanager.fragments.SelectorsListFragment.OnListFragmentInteractionListener
-import win.morannz.m.notificationmanager.R
-import win.morannz.m.notificationmanager.C
-
+import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_selector_list_item.view.*
 import win.morannz.m.notificationmanager.NotificationSelector
-import win.morannz.m.notificationmanager.fragments.SelectorsListFragment
+import win.morannz.m.notificationmanager.R
+import win.morannz.m.notificationmanager.fragments.SelectorsFragment
+import win.morannz.m.notificationmanager.fragments.SelectorsListFragment.OnListFragmentInteractionListener
 
 class SelectorListRecyclerViewAdapter(
     private val mValues: List<Pair<Int, NotificationSelector>>,
     private val mListener: OnListFragmentInteractionListener?
 ) : RecyclerView.Adapter<SelectorListRecyclerViewAdapter.ViewHolder>() {
+    companion object {
+        private val TAG = this::class.java.simpleName
+    }
 
     private val mOnClickListener: View.OnClickListener
 
     init {
         mOnClickListener = View.OnClickListener { v ->
-            mListener?.onListFragmentInteraction(C.NOTIFICATION_SELECTOR, v.tag)
+            mListener?.onListFragmentInteraction(SelectorsFragment.INTERACTION, v.tag)
         }
     }
 

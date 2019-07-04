@@ -24,6 +24,7 @@ class SelectorEditFragment : Fragment() {
     private var mTextWatchersEnabled: Boolean = true
 
     companion object {
+        private val TAG = this::class.java.simpleName
         private const val NOTIFICATION_SELECTOR_ID = "notificationSelectorId"
 
         fun newInstance(notificationSelectorId: Int) = SelectorEditFragment().apply {

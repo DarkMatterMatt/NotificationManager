@@ -2,20 +2,21 @@ package win.morannz.m.notificationmanager.fragments
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import win.morannz.m.notificationmanager.C
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import win.morannz.m.notificationmanager.R
 import win.morannz.m.notificationmanager.adapters.AlertListRecyclerViewAdapter
 import win.morannz.m.notificationmanager.getAlertGroups
 
 class AlertsListFragment : Fragment() {
+    companion object {
+        private val TAG = this::class.java.simpleName
+    }
+
     private var mListener: OnListFragmentInteractionListener? = null
 
     override fun onAttach(context: Context) {
