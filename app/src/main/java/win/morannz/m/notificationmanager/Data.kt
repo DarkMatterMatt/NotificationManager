@@ -175,7 +175,7 @@ fun extractDataFromStatusBarNotification(sbn: StatusBarNotification) : RecentNot
     return RecentNotification(
         packageName = sbn.packageName,
         time = sbn.postTime,
-        title = extras.getString(Notification.EXTRA_TITLE, ""),
-        text = extras.getString(Notification.EXTRA_TEXT, "")
+        title = extras.getCharSequence(Notification.EXTRA_TITLE)?.toString() ?: "",
+        text = extras.getCharSequence(Notification.EXTRA_TEXT)?.toString() ?: ""
     )
 }

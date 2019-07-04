@@ -63,8 +63,8 @@ class NotificationManagerService : NotificationListenerService() {
 
     private fun matchNotificationSelector(sbn: StatusBarNotification): NotificationSelector? {
         val n = sbn.notification
-        val title: String? = n.extras.getString(Notification.EXTRA_TITLE)
-        val text: String? = n.extras.getString(Notification.EXTRA_TEXT)
+        val title: String? = n.extras.getCharSequence(Notification.EXTRA_TITLE)?.toString()
+        val text: String? = n.extras.getCharSequence(Notification.EXTRA_TEXT)?.toString()
         val notificationSelectors = getNotificationSelectors(this)
 
         // loop through all selectors
