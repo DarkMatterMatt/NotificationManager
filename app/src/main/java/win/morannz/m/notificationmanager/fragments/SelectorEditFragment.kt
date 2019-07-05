@@ -109,10 +109,10 @@ class SelectorEditFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // handle item selection
-        when (item.itemId) {
-            R.id.action_selector_edit_cancel_edit -> return cancelEdit()
-            R.id.action_selector_edit_delete -> return deleteSelector()
-            else -> return super.onOptionsItemSelected(item)
+        return when (item.itemId) {
+            R.id.action_selector_edit_cancel_edit -> cancelEdit()
+            R.id.action_selector_edit_delete -> deleteSelector()
+            else -> super.onOptionsItemSelected(item)
         }
     }
 

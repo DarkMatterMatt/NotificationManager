@@ -68,7 +68,7 @@ class RecentListRecyclerViewAdapter(
         val mDatetimeView: TextView = mView.time
         val mTitleView: TextView = mView.title
         val mTextView: TextView = mView.text
-        val mPackageIconView: ImageView = mView.packageIcon
+        val mPackageIconView: ImageView = mView.package_icon
 
         override fun toString(): String {
             return "${super.toString()} '${mTitleView.text}'"

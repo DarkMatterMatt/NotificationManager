@@ -18,7 +18,9 @@ import win.morannz.m.notificationmanager.fragments.RecentsFragment
 import kotlin.math.roundToInt
 
 class NotificationManagerService : NotificationListenerService() {
-    private val TAG = this::class.java.simpleName
+    companion object {
+        private val TAG = this::class.java.simpleName
+    }
     private var mLastNotificationKey = ""
     private var lastNotificationTime = 0L
 

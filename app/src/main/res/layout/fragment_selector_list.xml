@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <androidx.recyclerview.widget.RecyclerView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/selector_list"
-        android:name="win.morannz.m.notificationmanager3.SelectorsFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layoutManager="LinearLayoutManager"
-        tools:context=".fragments.SelectorsListFragment"
-        tools:listitem="@layout/fragment_selector_list_item"/>
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/selector_list"
+    android:name="win.morannz.m.notificationmanager3.SelectorsFragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layoutManager="LinearLayoutManager"
+    tools:context=".fragments.SelectorsListFragment"
+    tools:listitem="@layout/fragment_selector_list_item" />

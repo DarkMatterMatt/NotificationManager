@@ -46,14 +46,12 @@ class MainActivity : AppCompatActivity(),
     }
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener {
-        navigate(
-            when (it.itemId) {
-                R.id.navigation_recents -> RecentsFragment.newInstance()
-                R.id.navigation_selectors -> SelectorsFragment.newInstance()
-                R.id.navigation_alerts -> AlertsFragment.newInstance()
-                else -> return@OnNavigationItemSelectedListener false
-            }
-        )
+        when (it.itemId) {
+            R.id.navigation_recents -> navigate(RecentsFragment.newInstance(), R.string.title_recents)
+            R.id.navigation_selectors -> navigate(SelectorsFragment.newInstance(), R.string.title_selectors)
+            R.id.navigation_alerts -> navigate(AlertsFragment.newInstance(), R.string.title_alerts)
+            else -> return@OnNavigationItemSelectedListener false
+        }
         true
     }
 
@@ -97,7 +95,7 @@ class MainActivity : AppCompatActivity(),
 
     override fun onDestroy() {
         super.onDestroy()
-        localBroadcastManager?.unregisterReceiver(broadcastReceiver);
+        localBroadcastManager?.unregisterReceiver(broadcastReceiver)
     }
 
     override fun onListFragmentInteraction(type: String, item: Any) {
@@ -109,11 +107,11 @@ class MainActivity : AppCompatActivity(),
         when (type) {
             SelectorsFragment.INTERACTION -> {
                 val destFragment = SelectorEditFragment.newInstance(data as Int)
-                navigate(destFragment, R.string.title_selectors)
+                navigate(destFragment, R.string.title_selector_edit)
             }
             AlertsFragment.INTERACTION -> {
                 val destFragment = AlertEditFragment.newInstance(data as Int)
-                navigate(destFragment, R.string.title_alerts)
+                navigate(destFragment, R.string.title_alert_edit)
             }
         }
     }
