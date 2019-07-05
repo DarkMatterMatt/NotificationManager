@@ -37,7 +37,7 @@ class RecentsListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_recent_list, container, false)
-        mRecentNotifications = getRecentNotifications(context!!)
+        mRecentNotifications = getRecentNotifications(context!!).toMutableList()
         mListAdapter = RecentListRecyclerViewAdapter(mRecentNotifications, mListener)
 
         // set the adapter

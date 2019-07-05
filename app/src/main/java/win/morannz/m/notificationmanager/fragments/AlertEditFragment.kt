@@ -19,13 +19,13 @@ import win.morannz.m.notificationmanager.*
 
 
 class AlertEditFragment : Fragment() {
-    private var mAgId: Int = -1
-    private var mAg: AlertGroup = AlertGroup()
-    private var mAgBackup: AlertGroup = AlertGroup()
+    private var mAgId = -1
+    private var mAg = AlertGroup()
+    private var mAgBackup = AlertGroup()
     private var mListener: OnFragmentInteractionListener? = null
     private var mAlertGroups = mutableMapOf<Int, AlertGroup>()
-    private var mTextWatchersEnabled: Boolean = true
-    private var mRelativeVolumeStreams = mutableMapOf<String, Int>()
+    private var mTextWatchersEnabled = true
+    private var mRelativeVolumeStreams = mapOf<String, Int>()
 
     companion object {
         private val TAG = this::class.java.simpleName
@@ -50,7 +50,7 @@ class AlertEditFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mAgId = arguments!!.getInt(ALERT_GROUP_ID)
-        mAlertGroups = getAlertGroups(context!!)
+        mAlertGroups = getAlertGroups(context!!).toMutableMap()
         mAg = mAlertGroups[mAgId] ?: AlertGroup()
 
         // deep copy the AlertGroup

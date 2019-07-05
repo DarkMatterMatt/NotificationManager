@@ -30,7 +30,7 @@ class NotificationManagerService : NotificationListenerService() {
         Log.d(TAG, "Notification posted: ${sbn.key}")
 
         // save notification
-        val recentNotifications = getRecentNotifications(this)
+        val recentNotifications = getRecentNotifications(this).toMutableList()
         val rn = extractDataFromStatusBarNotification(sbn)
         recentNotifications.add(0, rn)
         saveRecentNotifications(this, recentNotifications.take(C.MAX_NUMBER_OF_RECENT_NOTIFICATIONS).toMutableList())

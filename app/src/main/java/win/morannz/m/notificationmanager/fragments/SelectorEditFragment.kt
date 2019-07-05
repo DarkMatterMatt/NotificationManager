@@ -14,14 +14,14 @@ import win.morannz.m.notificationmanager.*
 
 class SelectorEditFragment : Fragment() {
     private var mNsId: Int = -1
-    private var mNs: NotificationSelector = NotificationSelector()
-    private var mNsBackup: NotificationSelector = NotificationSelector()
+    private var mNs = NotificationSelector()
+    private var mNsBackup = NotificationSelector()
     private var mListener: OnFragmentInteractionListener? = null
-    private var mAlertGroups: MutableMap<Int, AlertGroup> = mutableMapOf()
-    private var mAlertGroupsNameLookup: MutableMap<String, Int> = mutableMapOf()
-    private var mNotificationSelectors: MutableMap<Int, NotificationSelector> = mutableMapOf()
-    private var mPackages: MutableList<String> = mutableListOf()
-    private var mTextWatchersEnabled: Boolean = true
+    private var mAlertGroups = mapOf<Int, AlertGroup>()
+    private var mAlertGroupsNameLookup = mapOf<String, Int>()
+    private var mNotificationSelectors = mutableMapOf<Int, NotificationSelector>()
+    private var mPackages = listOf<String>()
+    private var mTextWatchersEnabled = true
 
     companion object {
         private val TAG = this::class.java.simpleName
@@ -49,7 +49,7 @@ class SelectorEditFragment : Fragment() {
         mNsId = arguments!!.getInt(NOTIFICATION_SELECTOR_ID)
 
         // load list of notification selectors and packages
-        mNotificationSelectors = getNotificationSelectors(context!!)
+        mNotificationSelectors = getNotificationSelectors(context!!).toMutableMap()
         mNs = mNotificationSelectors[mNsId] ?: NotificationSelector()
         mPackages = getPackagesWithNotifications(context!!)
 
@@ -58,9 +58,7 @@ class SelectorEditFragment : Fragment() {
 
         // load alert groups, create lookup map
         mAlertGroups = getAlertGroups(context!!)
-        for ((id, ag) in mAlertGroups) {
-            mAlertGroupsNameLookup[ag.name] = id
-        }
+        mAlertGroupsNameLookup = mAlertGroups.map { (id, ag) -> ag.name to id }.toMap()
 
         setHasOptionsMenu(true)
     }
