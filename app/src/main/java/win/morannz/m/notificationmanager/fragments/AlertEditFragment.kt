@@ -17,7 +17,6 @@ import kotlinx.android.synthetic.main.fragment_alert_edit.*
 import kotlinx.serialization.json.Json
 import win.morannz.m.notificationmanager.*
 
-
 class AlertEditFragment : Fragment() {
     private var mAgId = -1
     private var mAg = AlertGroup()

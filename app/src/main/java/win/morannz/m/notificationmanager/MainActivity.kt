@@ -29,17 +29,20 @@ class MainActivity : AppCompatActivity(),
     RecentsFragment.OnFragmentInteractionListener,
     RecentsListFragment.OnListFragmentInteractionListener {
     //RecentViewFragment.OnFragmentInteractionListener {
+    companion object {
+        private val TAG = this::class.java.simpleName
+    }
 
     private var localBroadcastManager: LocalBroadcastManager? = null
+    private var currentFragment: Fragment? = null
 
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == RecentsFragment.INTENT_UPDATE) {
                 val rnString = intent.getStringExtra(RecentsFragment.UPDATE_DATA)
                 val rn = Json.parse(RecentNotification.serializer(), rnString)
-                val fragment = supportFragmentManager.findFragmentById(R.id.fragment)
-                    ?.childFragmentManager?.findFragmentById(R.id.fragment_recent_list)
-                if (fragment !== null && fragment is RecentsListFragment) {
+                val fragment = currentFragment
+                if (fragment is RecentsListFragment) {
                     fragment.updateList(rn)
                 }
             }
@@ -119,6 +122,9 @@ class MainActivity : AppCompatActivity(),
 
     private fun navigate(destFragment: Fragment, destTitle: Int? = null) {
         val addToBackStack = false
+
+        // save the new fragment
+        currentFragment = destFragment
 
         // perform fragment swap
         val t = supportFragmentManager.beginTransaction()
