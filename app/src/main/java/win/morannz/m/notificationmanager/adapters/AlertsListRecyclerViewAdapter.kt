@@ -5,16 +5,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.fragment_selector_list_item.view.*
-import win.morannz.m.notificationmanager.NotificationSelector
+import kotlinx.android.synthetic.main.fragment_alerts_list_item.view.*
+import win.morannz.m.notificationmanager.AlertGroup
 import win.morannz.m.notificationmanager.R
-import win.morannz.m.notificationmanager.fragments.SelectorsFragment
-import win.morannz.m.notificationmanager.fragments.SelectorsListFragment.OnListFragmentInteractionListener
+import win.morannz.m.notificationmanager.fragments.AlertsFragment
+import win.morannz.m.notificationmanager.fragments.AlertsListFragment.OnListFragmentInteractionListener
 
-class SelectorListRecyclerViewAdapter(
-    private val mValues: List<Pair<Int, NotificationSelector>>,
+class AlertsListRecyclerViewAdapter(
+    private val mValues: List<Pair<Int, AlertGroup>>,
     private val mListener: OnListFragmentInteractionListener?
-) : RecyclerView.Adapter<SelectorListRecyclerViewAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<AlertsListRecyclerViewAdapter.ViewHolder>() {
     companion object {
         private val TAG = this::class.java.simpleName
     }
@@ -23,13 +23,13 @@ class SelectorListRecyclerViewAdapter(
 
     init {
         mOnClickListener = View.OnClickListener { v ->
-            mListener?.onListFragmentInteraction(SelectorsFragment.INTERACTION, v.tag)
+            mListener?.onListFragmentInteraction(AlertsFragment.INTERACTION, v.tag)
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.fragment_selector_list_item, parent, false)
+            .inflate(R.layout.fragment_alerts_list_item, parent, false)
         return ViewHolder(view)
     }
 

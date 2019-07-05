@@ -10,4 +10,4 @@
     android:layout_height="match_parent"
     app:layoutManager="LinearLayoutManager"
     tools:context=".fragments.AlertsListFragment"
-    tools:listitem="@layout/fragment_alert_list_item" />
+    tools:listitem="@layout/fragment_alerts_list_item" />

@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.fragment_recent_list_item.view.*
+import kotlinx.android.synthetic.main.fragment_recents_list_item.view.*
 import win.morannz.m.notificationmanager.R
 import win.morannz.m.notificationmanager.RecentNotification
 import win.morannz.m.notificationmanager.fragments.RecentsFragment
@@ -16,10 +16,10 @@ import win.morannz.m.notificationmanager.fragments.RecentsListFragment.OnListFra
 import java.text.SimpleDateFormat
 import java.util.*
 
-class RecentListRecyclerViewAdapter(
+class RecentsListRecyclerViewAdapter(
     private val mValues: List<RecentNotification>,
     private val mListener: OnListFragmentInteractionListener?
-) : RecyclerView.Adapter<RecentListRecyclerViewAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<RecentsListRecyclerViewAdapter.ViewHolder>() {
     companion object {
         private val TAG = this::class.java.simpleName
     }
@@ -34,7 +34,7 @@ class RecentListRecyclerViewAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.fragment_recent_list_item, parent, false)
+            .inflate(R.layout.fragment_recents_list_item, parent, false)
         return ViewHolder(view)
     }
 

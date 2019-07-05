@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import win.morannz.m.notificationmanager.R
-import win.morannz.m.notificationmanager.adapters.AlertListRecyclerViewAdapter
+import win.morannz.m.notificationmanager.adapters.AlertsListRecyclerViewAdapter
 import win.morannz.m.notificationmanager.getAlertGroups
 
 class AlertsListFragment : Fragment() {
@@ -32,14 +32,14 @@ class AlertsListFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_alert_list, container, false)
+        val view = inflater.inflate(R.layout.fragment_alerts_list, container, false)
         val alertGroups = getAlertGroups(context!!)
 
         // set the adapter
         if (view is RecyclerView) {
             with (view) {
                 layoutManager = LinearLayoutManager(context)
-                adapter = AlertListRecyclerViewAdapter(alertGroups.toList(), mListener)
+                adapter = AlertsListRecyclerViewAdapter(alertGroups.toList(), mListener)
             }
         }
         return view

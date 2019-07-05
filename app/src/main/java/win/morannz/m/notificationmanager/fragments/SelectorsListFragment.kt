@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import win.morannz.m.notificationmanager.R
-import win.morannz.m.notificationmanager.adapters.SelectorListRecyclerViewAdapter
+import win.morannz.m.notificationmanager.adapters.SelectorsListRecyclerViewAdapter
 import win.morannz.m.notificationmanager.getNotificationSelectors
 
 class SelectorsListFragment : Fragment() {
@@ -32,14 +32,14 @@ class SelectorsListFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_selector_list, container, false)
+        val view = inflater.inflate(R.layout.fragment_selectors_list, container, false)
         val notificationSelectors = getNotificationSelectors(context!!)
 
         // set the adapter
         if (view is RecyclerView) {
             with (view) {
                 layoutManager = LinearLayoutManager(context)
-                adapter = SelectorListRecyclerViewAdapter(notificationSelectors.toList(), mListener)
+                adapter = SelectorsListRecyclerViewAdapter(notificationSelectors.toList(), mListener)
             }
         }
         return view

@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import win.morannz.m.notificationmanager.C
 import win.morannz.m.notificationmanager.R
 import win.morannz.m.notificationmanager.RecentNotification
-import win.morannz.m.notificationmanager.adapters.RecentListRecyclerViewAdapter
+import win.morannz.m.notificationmanager.adapters.RecentsListRecyclerViewAdapter
 import win.morannz.m.notificationmanager.getRecentNotifications
 
 class RecentsListFragment : Fragment() {
@@ -20,7 +20,7 @@ class RecentsListFragment : Fragment() {
     }
 
     private var mListener: OnListFragmentInteractionListener? = null
-    private var mListAdapter: RecentListRecyclerViewAdapter? = null
+    private var mListAdapter: RecentsListRecyclerViewAdapter? = null
     private var mRecentNotifications = mutableListOf<RecentNotification>()
 
     override fun onAttach(context: Context) {
@@ -36,9 +36,9 @@ class RecentsListFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_recent_list, container, false)
+        val view = inflater.inflate(R.layout.fragment_recents_list, container, false)
         mRecentNotifications = getRecentNotifications(context!!).toMutableList()
-        mListAdapter = RecentListRecyclerViewAdapter(mRecentNotifications, mListener)
+        mListAdapter = RecentsListRecyclerViewAdapter(mRecentNotifications, mListener)
 
         // set the adapter
         if (view is RecyclerView) {
