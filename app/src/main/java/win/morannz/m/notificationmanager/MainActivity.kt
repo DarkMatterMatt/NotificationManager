@@ -30,14 +30,15 @@ class MainActivity : AppCompatActivity(),
     RecentsListFragment.OnListFragmentInteractionListener {
     //RecentViewFragment.OnFragmentInteractionListener {
 
-    private var localBroadcastManager : LocalBroadcastManager? = null
+    private var localBroadcastManager: LocalBroadcastManager? = null
 
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == RecentsFragment.INTENT_UPDATE) {
                 val rnString = intent.getStringExtra(RecentsFragment.UPDATE_DATA)
                 val rn = Json.parse(RecentNotification.serializer(), rnString)
-                val fragment = supportFragmentManager.findFragmentById(R.id.fragment)?.childFragmentManager?.findFragmentById(R.id.fragment_recent_list)
+                val fragment = supportFragmentManager.findFragmentById(R.id.fragment)
+                    ?.childFragmentManager?.findFragmentById(R.id.fragment_recent_list)
                 if (fragment !== null && fragment is RecentsListFragment) {
                     fragment.updateList(rn)
                 }

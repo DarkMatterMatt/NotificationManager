@@ -21,6 +21,7 @@ class NotificationManagerService : NotificationListenerService() {
     companion object {
         private val TAG = this::class.java.simpleName
     }
+
     private var mLastNotificationKey = ""
     private var lastNotificationTime = 0L
 
@@ -98,7 +99,8 @@ class NotificationManagerService : NotificationListenerService() {
             }
 
             // limit frequency of alerts
-            if (System.currentTimeMillis() < getNotificationSelectorLastAlertTime(this, id) + ns.minSecsBetweenAlerts * 1000) {
+            if (System.currentTimeMillis() < getNotificationSelectorLastAlertTime(this, id)
+                    + ns.minSecsBetweenAlerts * 1000) {
                 continue
             }
 
@@ -138,16 +140,17 @@ class NotificationManagerService : NotificationListenerService() {
             .build()
 
         var volumePercent = alertGroup.volumePercent / 100F
-        val relativeStreamVolumePercent = am.getStreamVolume(alertGroup.relativeVolumeStream) / am.getStreamMaxVolume(alertGroup.relativeVolumeStream).toFloat()
-        val alarmStreamVolumePercent = am.getStreamVolume(AudioManager.STREAM_ALARM) / am.getStreamMaxVolume(AudioManager.STREAM_ALARM).toFloat()
+        val relativeStreamVolumePercent =
+            am.getStreamVolume(alertGroup.relativeVolumeStream) / am.getStreamMaxVolume(alertGroup.relativeVolumeStream).toFloat()
+        val alarmStreamVolumePercent =
+            am.getStreamVolume(AudioManager.STREAM_ALARM) / am.getStreamMaxVolume(AudioManager.STREAM_ALARM).toFloat()
         if (!alertGroup.absoluteVolume) {
             volumePercent *= relativeStreamVolumePercent
         }
 
         if (volumePercent < alarmStreamVolumePercent && Build.VERSION.SDK_INT >= 28) {
             ringtone.volume = volumePercent / alarmStreamVolumePercent
-        }
-        else { // need to change the stream volume
+        } else { // need to change the stream volume
             // use ringtone volume if possible
             if (Build.VERSION.SDK_INT >= 28) {
                 ringtone.volume = volumePercent

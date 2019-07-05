@@ -18,7 +18,7 @@ import kotlinx.serialization.map
  */
 
 @Serializable
-data class NotificationSelector (
+data class NotificationSelector(
     var name: String = "",
     var comment: String = "",
     var minSecsBetweenAlerts: Int = 0,
@@ -31,7 +31,7 @@ data class NotificationSelector (
 )
 
 @Serializable
-data class AlertGroup (
+data class AlertGroup(
     var name: String = "",
     var comment: String = "",
     var minSecsBetweenAlerts: Int = 0,
@@ -49,7 +49,7 @@ data class AlertGroup (
 )
 
 @Serializable
-data class RecentNotification (
+data class RecentNotification(
     val packageName: String,
     val time: Long,
     val title: String,
@@ -59,11 +59,12 @@ data class RecentNotification (
 // Packages that send notifications
 private const val PACKAGES_WITH_NOTIFICATIONS = "packagesWithNotifications"
 private val PACKAGES_WITH_NOTIFICATIONS_EXCLUDE_LIST = listOf("android")
-fun getPackagesWithNotifications(context: Context) : List<String> {
+fun getPackagesWithNotifications(context: Context): List<String> {
     val p = PreferenceManager.getDefaultSharedPreferences(context)
     val packagesString = p.getString(PACKAGES_WITH_NOTIFICATIONS, null) ?: return listOf()
     return packagesString.split(",")
 }
+
 fun recordPackageWithNotifications(context: Context, packageName: String) {
     if (packageName in PACKAGES_WITH_NOTIFICATIONS_EXCLUDE_LIST) {
         return
@@ -83,11 +84,12 @@ fun recordPackageWithNotifications(context: Context, packageName: String) {
 private const val NOTIFICATION_SELECTORS = "notificationSelectors"
 private const val NOTIFICATION_SELECTORS_MAX_INDEX = "notificationSelectorsMaxIndex"
 private const val NOTIFICATION_SELECTOR_LAST_ALERT_TIME = "notificationSelectorLastAlertTime:"
-fun getNotificationSelectors(context: Context) : Map<Int, NotificationSelector> {
+fun getNotificationSelectors(context: Context): Map<Int, NotificationSelector> {
     val p = PreferenceManager.getDefaultSharedPreferences(context)
     val nsString = p.getString(NOTIFICATION_SELECTORS, null) ?: return mapOf()
     return Json.parse((IntSerializer to NotificationSelector.serializer()).map, nsString)
 }
+
 fun saveNotificationSelectors(context: Context, notificationSelectors: Map<Int, NotificationSelector>) {
     val p = PreferenceManager.getDefaultSharedPreferences(context)
     val e = p.edit()
@@ -95,7 +97,8 @@ fun saveNotificationSelectors(context: Context, notificationSelectors: Map<Int, 
     e.putString(NOTIFICATION_SELECTORS, nsString)
     e.apply()
 }
-fun getNotificationSelectorNewIndex(context: Context) : Int {
+
+fun getNotificationSelectorNewIndex(context: Context): Int {
     val p = PreferenceManager.getDefaultSharedPreferences(context)
     val e = p.edit()
     val newIndex = p.getInt(NOTIFICATION_SELECTORS_MAX_INDEX, -1) + 1
@@ -103,10 +106,12 @@ fun getNotificationSelectorNewIndex(context: Context) : Int {
     e.apply()
     return newIndex
 }
-fun getNotificationSelectorLastAlertTime(context: Context, id: Int) : Long {
+
+fun getNotificationSelectorLastAlertTime(context: Context, id: Int): Long {
     val p = PreferenceManager.getDefaultSharedPreferences(context)
     return p.getLong(NOTIFICATION_SELECTOR_LAST_ALERT_TIME + id, 0)
 }
+
 fun saveNotificationSelectorLastAlertTime(context: Context, id: Int, lastAlertTime: Long) {
     val p = PreferenceManager.getDefaultSharedPreferences(context)
     val e = p.edit()
@@ -118,11 +123,12 @@ fun saveNotificationSelectorLastAlertTime(context: Context, id: Int, lastAlertTi
 private const val ALERT_GROUPS = "alertGroups"
 private const val ALERT_GROUPS_MAX_INDEX = "alertGroupsMaxIndex"
 private const val ALERT_GROUP_LAST_ALERT_TIME = "alertGroupLastAlertTime:"
-fun getAlertGroups(context: Context) : Map<Int, AlertGroup> {
+fun getAlertGroups(context: Context): Map<Int, AlertGroup> {
     val p = PreferenceManager.getDefaultSharedPreferences(context)
     val agString = p.getString(ALERT_GROUPS, null) ?: return mapOf()
     return Json.parse((IntSerializer to AlertGroup.serializer()).map, agString)
 }
+
 fun saveAlertGroups(context: Context, alertGroups: Map<Int, AlertGroup>) {
     val p = PreferenceManager.getDefaultSharedPreferences(context)
     val e = p.edit()
@@ -130,7 +136,8 @@ fun saveAlertGroups(context: Context, alertGroups: Map<Int, AlertGroup>) {
     e.putString(ALERT_GROUPS, agString)
     e.apply()
 }
-fun getAlertGroupNewIndex(context: Context) : Int {
+
+fun getAlertGroupNewIndex(context: Context): Int {
     val p = PreferenceManager.getDefaultSharedPreferences(context)
     val e = p.edit()
     val newIndex = p.getInt(ALERT_GROUPS_MAX_INDEX, -1) + 1
@@ -138,10 +145,12 @@ fun getAlertGroupNewIndex(context: Context) : Int {
     e.apply()
     return newIndex
 }
-fun getAlertGroupLastAlertTime(context: Context, id: Int) : Long {
+
+fun getAlertGroupLastAlertTime(context: Context, id: Int): Long {
     val p = PreferenceManager.getDefaultSharedPreferences(context)
     return p.getLong(ALERT_GROUP_LAST_ALERT_TIME + id, 0)
 }
+
 fun saveAlertGroupLastAlertTime(context: Context, id: Int, lastAlertTime: Long) {
     val p = PreferenceManager.getDefaultSharedPreferences(context)
     val e = p.edit()
@@ -151,11 +160,13 @@ fun saveAlertGroupLastAlertTime(context: Context, id: Int, lastAlertTime: Long) 
 
 // Recent Notifications
 private const val RECENT_NOTIFICATIONS = "recentNotifications"
-fun getRecentNotifications(context: Context) : List<RecentNotification> {
+
+fun getRecentNotifications(context: Context): List<RecentNotification> {
     val p = PreferenceManager.getDefaultSharedPreferences(context)
     val rnString = p.getString(RECENT_NOTIFICATIONS, null) ?: return listOf()
     return Json.parse(RecentNotification.serializer().list, rnString)
 }
+
 fun saveRecentNotifications(context: Context, recentNotifications: List<RecentNotification>) {
     val p = PreferenceManager.getDefaultSharedPreferences(context)
     val e = p.edit()
@@ -163,7 +174,8 @@ fun saveRecentNotifications(context: Context, recentNotifications: List<RecentNo
     e.putString(RECENT_NOTIFICATIONS, rnString)
     e.apply()
 }
-fun extractDataFromStatusBarNotification(sbn: StatusBarNotification) : RecentNotification {
+
+fun extractDataFromStatusBarNotification(sbn: StatusBarNotification): RecentNotification {
     val extras = sbn.notification.extras
     return RecentNotification(
         packageName = sbn.packageName,

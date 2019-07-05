@@ -54,7 +54,8 @@ class SelectorEditFragment : Fragment() {
         mPackages = getPackagesWithNotifications(context!!)
 
         // deep copy the notificationSelector
-        mNsBackup = Json.parse(NotificationSelector.serializer(), Json.stringify(NotificationSelector.serializer(), mNs))
+        mNsBackup =
+            Json.parse(NotificationSelector.serializer(), Json.stringify(NotificationSelector.serializer(), mNs))
 
         // load alert groups, create lookup map
         mAlertGroups = getAlertGroups(context!!)
@@ -141,7 +142,9 @@ class SelectorEditFragment : Fragment() {
         selector_edit_package_name.saveAfterTextChanged { mNs.packageName = it }
         selector_edit_match_title.saveAfterTextChanged { mNs.matchTitle = it }
         selector_edit_match_text.saveAfterTextChanged { mNs.matchText = it }
-        selector_edit_min_secs_between_alerts.saveAfterTextChanged { if (it != "") mNs.minSecsBetweenAlerts = it.toInt() }
+        selector_edit_min_secs_between_alerts.saveAfterTextChanged {
+            if (it != "") mNs.minSecsBetweenAlerts = it.toInt()
+        }
     }
 
     private fun populateFields(ns: NotificationSelector) {
@@ -158,7 +161,8 @@ class SelectorEditFragment : Fragment() {
 
     private fun cancelEdit(): Boolean {
         populateFields(mNsBackup)
-        mNs = Json.parse(NotificationSelector.serializer(), Json.stringify(NotificationSelector.serializer(), mNsBackup))
+        mNs =
+            Json.parse(NotificationSelector.serializer(), Json.stringify(NotificationSelector.serializer(), mNsBackup))
         mNotificationSelectors[mNsId] = mNs
         saveNotificationSelectors(context!!, mNotificationSelectors)
         return true
