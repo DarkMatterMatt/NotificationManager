@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.service.notification.NotificationListenerService.requestRebind
 import android.text.TextUtils
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
@@ -33,8 +34,8 @@ class MainActivity : AppCompatActivity(),
         private val TAG = this::class.java.simpleName
     }
 
-    private var localBroadcastManager: LocalBroadcastManager? = null
-    private var currentFragment: Fragment? = null
+    private lateinit var localBroadcastManager: LocalBroadcastManager
+    private lateinit var currentFragment: Fragment
 
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -42,8 +43,11 @@ class MainActivity : AppCompatActivity(),
                 val rnString = intent.getStringExtra(RecentsFragment.UPDATE_DATA)
                 val rn = Json.parse(RecentNotification.serializer(), rnString)
                 val fragment = currentFragment
-                if (fragment is RecentsListFragment) {
-                    fragment.updateList(rn)
+                if (fragment is RecentsFragment) {
+                    val recentsListFragment = fragment.childFragmentManager.findFragmentById(R.id.fragment_recents_list)
+                    if (recentsListFragment is RecentsListFragment) {
+                        recentsListFragment.updateList(rn)
+                    }
                 }
             }
         }
@@ -92,14 +96,24 @@ class MainActivity : AppCompatActivity(),
         restartNotificationService()
 
         localBroadcastManager = LocalBroadcastManager.getInstance(this)
-        localBroadcastManager?.registerReceiver(broadcastReceiver, IntentFilter().apply {
+        localBroadcastManager.registerReceiver(broadcastReceiver, IntentFilter().apply {
             addAction(RecentsFragment.INTENT_UPDATE)
         })
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        localBroadcastManager?.unregisterReceiver(broadcastReceiver)
+        localBroadcastManager.unregisterReceiver(broadcastReceiver)
+    }
+
+    override fun onBackPressed() {
+        if (currentFragment is AlertEditFragment) {
+            navigate(AlertsFragment.newInstance(), R.string.title_alerts)
+        } else if (currentFragment is SelectorEditFragment) {
+            navigate(SelectorsFragment.newInstance(), R.string.title_selectors)
+        } else {
+            super.onBackPressed()
+        }
     }
 
     override fun onListFragmentInteraction(type: String, item: Any) {
