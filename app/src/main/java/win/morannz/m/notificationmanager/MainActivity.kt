@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.provider.Settings
 import android.service.notification.NotificationListenerService.requestRebind
 import android.text.TextUtils
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
@@ -34,15 +33,15 @@ class MainActivity : AppCompatActivity(),
         private val TAG = this::class.java.simpleName
     }
 
-    private lateinit var localBroadcastManager: LocalBroadcastManager
-    private lateinit var currentFragment: Fragment
+    private lateinit var mLocalBroadcastManager: LocalBroadcastManager
+    private lateinit var mCurrentFragment: Fragment
 
-    private val broadcastReceiver = object : BroadcastReceiver() {
+    private val mBroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == RecentsFragment.INTENT_UPDATE) {
                 val rnString = intent.getStringExtra(RecentsFragment.UPDATE_DATA)
                 val rn = Json.parse(RecentNotification.serializer(), rnString)
-                val fragment = currentFragment
+                val fragment = mCurrentFragment
                 if (fragment is RecentsFragment) {
                     val recentsListFragment = fragment.childFragmentManager.findFragmentById(R.id.fragment_recents_list)
                     if (recentsListFragment is RecentsListFragment) {
@@ -95,21 +94,21 @@ class MainActivity : AppCompatActivity(),
 
         restartNotificationService()
 
-        localBroadcastManager = LocalBroadcastManager.getInstance(this)
-        localBroadcastManager.registerReceiver(broadcastReceiver, IntentFilter().apply {
+        mLocalBroadcastManager = LocalBroadcastManager.getInstance(this)
+        mLocalBroadcastManager.registerReceiver(mBroadcastReceiver, IntentFilter().apply {
             addAction(RecentsFragment.INTENT_UPDATE)
         })
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        localBroadcastManager.unregisterReceiver(broadcastReceiver)
+        mLocalBroadcastManager.unregisterReceiver(mBroadcastReceiver)
     }
 
     override fun onBackPressed() {
-        if (currentFragment is AlertEditFragment) {
+        if (mCurrentFragment is AlertEditFragment) {
             navigate(AlertsFragment.newInstance(), R.string.title_alerts)
-        } else if (currentFragment is SelectorEditFragment) {
+        } else if (mCurrentFragment is SelectorEditFragment) {
             navigate(SelectorsFragment.newInstance(), R.string.title_selectors)
         } else {
             super.onBackPressed()
@@ -138,7 +137,7 @@ class MainActivity : AppCompatActivity(),
         val addToBackStack = false
 
         // save the new fragment
-        currentFragment = destFragment
+        mCurrentFragment = destFragment
 
         // perform fragment swap
         val t = supportFragmentManager.beginTransaction()
