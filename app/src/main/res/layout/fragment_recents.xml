@@ -9,7 +9,7 @@
     tools:context=".fragments.RecentsFragment">
 
     <fragment
-        android:id="@+id/fragment_recent_list"
+        android:id="@+id/fragment_recents_list"
         android:name="win.morannz.m.notificationmanager.fragments.RecentsListFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"

@@ -9,7 +9,7 @@
     tools:context=".fragments.SelectorsFragment">
 
     <fragment
-        android:id="@+id/fragment_selector_list"
+        android:id="@+id/fragment_selectors_list"
         android:name="win.morannz.m.notificationmanager.fragments.SelectorsListFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"

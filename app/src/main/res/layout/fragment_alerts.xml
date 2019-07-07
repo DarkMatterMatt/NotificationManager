@@ -9,7 +9,7 @@
     tools:context=".fragments.AlertsFragment">
 
     <fragment
-        android:id="@+id/fragment_alert_list"
+        android:id="@+id/fragment_alerts_list"
         android:name="win.morannz.m.notificationmanager.fragments.AlertsListFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
