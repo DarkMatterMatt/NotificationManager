@@ -134,16 +134,11 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun navigate(destFragment: Fragment, destTitle: Int? = null) {
-        val addToBackStack = false
-
         // save the new fragment
         mCurrentFragment = destFragment
 
         // perform fragment swap
         val t = supportFragmentManager.beginTransaction()
-        if (addToBackStack) {
-            t.addToBackStack(null)
-        }
         t.replace(R.id.fragment, destFragment, destFragment::class.java.canonicalName)
         t.commit()
 
