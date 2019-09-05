@@ -36,7 +36,8 @@ data class AlertGroup(
     var comment: String = "",
     var minSecsBetweenAlerts: Int = 0,
 
-    var vibrationPattern: String? = null,
+    var vibrationPatternTimings: String? = null,
+    var vibrationPatternAmplitudes: String? = null,
     var soundUri: String? = null,
     var alertWhenScreenOn: Boolean = true,
 

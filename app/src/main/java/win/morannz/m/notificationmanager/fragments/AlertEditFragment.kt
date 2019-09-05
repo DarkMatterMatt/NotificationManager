@@ -155,7 +155,7 @@ class AlertEditFragment : Fragment() {
         alert_edit_comment.afterTextChanged { mAg.comment = it }
         alert_edit_min_secs_between_alerts.afterTextChanged { if (it != "") mAg.minSecsBetweenAlerts = it.toInt() }
         alert_edit_sound_uri.setOnClickListener { selectSoundUri() }
-        alert_edit_vibration_pattern.afterTextChanged { mAg.vibrationPattern = it }
+        alert_edit_vibration_pattern.afterTextChanged { mAg.vibrationPatternTimings = it }
         alert_edit_alert_when_screen_on.setOnCheckedChangeListener { _, isChecked ->
             applyChanges { mAg.alertWhenScreenOn = isChecked }
         }
@@ -190,7 +190,7 @@ class AlertEditFragment : Fragment() {
         alert_edit_comment.setText(ag.comment)
         alert_edit_min_secs_between_alerts.setText(ag.minSecsBetweenAlerts.toString())
         alert_edit_sound_uri.setText(ag.soundUri)
-        alert_edit_vibration_pattern.setText(ag.vibrationPattern)
+        alert_edit_vibration_pattern.setText(ag.vibrationPatternTimings)
         alert_edit_alert_when_screen_on.isChecked = ag.alertWhenScreenOn
         alert_edit_absolute_volume.isChecked = ag.absoluteVolume
         alert_edit_volume_percent.setText(ag.volumePercent.toString())

@@ -184,16 +184,30 @@ class NotificationManagerService : NotificationListenerService() {
         val am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         if ((alertGroup.vibrationRingerModes and getRingerMode(am)) == 0) return
 
-        // convert pattern (string) to LongArray
-        val pattern = alertGroup.vibrationPattern?.split(",")?.map { it.toLong() }?.toLongArray() ?: return
+        // convert timings (string) to LongArray
+        val timings = alertGroup.vibrationPatternTimings?.split(",")?.map { it.toLong() }?.toLongArray() ?: return
+
+        // convert amplitudes (string) to LongArray
+        val amplitudes = alertGroup.vibrationPatternTimings?.split(",")?.map { it.toInt() }?.toIntArray()
+
+        // get Vibrator
         val v = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
+        // use VibrationEffect if supported
         if (Build.VERSION.SDK_INT >= 26) {
-            val wave = VibrationEffect.createWaveform(pattern, -1)
-            v.vibrate(wave)
+            // use amplitudes for each timing if possible
+            if (amplitudes !== null) {
+                val wave = VibrationEffect.createWaveform(timings, amplitudes, -1)
+                v.vibrate(wave)
+            }
+            // if no amplitudes then it is max power on, off, max power on ... etc
+            else {
+                val wave = VibrationEffect.createWaveform(timings, -1)
+                v.vibrate(wave)
+            }
         } else {
             @Suppress("DEPRECATION")
-            v.vibrate(pattern, -1)
+            v.vibrate(timings, -1)
         }
     }
 
