@@ -57,9 +57,9 @@ class MainActivity : AppCompatActivity(),
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener {
         when (it.itemId) {
-            R.id.navigation_recents -> navigate(RecentsFragment.newInstance(), R.string.title_recents)
-            R.id.navigation_selectors -> navigate(SelectorsFragment.newInstance(), R.string.title_selectors)
-            R.id.navigation_alerts -> navigate(AlertsFragment.newInstance(), R.string.title_alerts)
+            R.id.navigation_recents -> navigate(RecentsFragment.newInstance())
+            R.id.navigation_selectors -> navigate(SelectorsFragment.newInstance())
+            R.id.navigation_alerts -> navigate(AlertsFragment.newInstance())
             else -> return@OnNavigationItemSelectedListener false
         }
         true
@@ -86,17 +86,24 @@ class MainActivity : AppCompatActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // bind action bar and navigation menu
         setSupportActionBar(toolbar)
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
-        navigate(RecentsFragment.newInstance(), R.string.title_notification_manager)
+
+        // load default fragment (Recents view)
+        navigate(RecentsFragment.newInstance())
 
         // prompt user to enable the notification listener service
         if (!isNotificationServiceEnabled()) {
             showNotificationServiceAlertDialog()
         }
 
+        // sometimes the notification service crashes
+        // this will restart it whenever the app is opened
         restartNotificationService()
 
+        // catch refresh-list requests from the notification listener service
         mLocalBroadcastManager = LocalBroadcastManager.getInstance(this)
         mLocalBroadcastManager.registerReceiver(mBroadcastReceiver, IntentFilter().apply {
             addAction(RecentsFragment.INTENT_UPDATE)
@@ -131,16 +138,16 @@ class MainActivity : AppCompatActivity(),
         when (type) {
             SelectorsFragment.INTERACTION -> {
                 val destFragment = SelectorEditFragment.newInstance(data as Int)
-                navigate(destFragment, R.string.title_selector_edit)
+                navigate(destFragment)
             }
             AlertsFragment.INTERACTION -> {
                 val destFragment = AlertEditFragment.newInstance(data as Int)
-                navigate(destFragment, R.string.title_alert_edit)
+                navigate(destFragment)
             }
         }
     }
 
-    private fun navigate(destFragment: Fragment, destTitle: Int? = null) {
+    private fun navigate(destFragment: Fragment) {
         // save the new fragment
         mCurrentFragment = destFragment
 
@@ -164,9 +171,6 @@ class MainActivity : AppCompatActivity(),
         // perform fragment swap
         transaction.replace(R.id.fragment, destFragment, destFragment::class.java.canonicalName)
         transaction.commit()
-
-        // change the title
-        if (destTitle !== null) setTitle(destTitle)
     }
 
     private fun restartNotificationService() {

@@ -21,10 +21,10 @@ class SelectorEditFragment : Fragment() {
     private var mAlertGroupsNameLookup = mapOf<String, Int>()
     private var mNotificationSelectors = mutableMapOf<Int, NotificationSelector>()
     private var mPackages = listOf<String>()
-    private var mTextWatchersEnabled = true
+    private var mAutoSaveEnabled = true
 
     companion object {
-        private val TAG = this::class.java.simpleName
+        private val TAG = SelectorEditFragment::class.java.simpleName
         private const val NOTIFICATION_SELECTOR_ID = "notificationSelectorId"
 
         fun newInstance(notificationSelectorId: Int) = SelectorEditFragment().apply {
@@ -53,9 +53,11 @@ class SelectorEditFragment : Fragment() {
         mNs = mNotificationSelectors[mNsId] ?: NotificationSelector()
         mPackages = getPackagesWithNotifications(context!!)
 
-        // deep copy the notificationSelector
-        mNsBackup =
-            Json.parse(NotificationSelector.serializer(), Json.stringify(NotificationSelector.serializer(), mNs))
+        // deep copy the notification selector as a backup (so we can revert if the user cancels)
+        mNsBackup = Json.parse(
+            NotificationSelector.serializer(),
+            Json.stringify(NotificationSelector.serializer(), mNs)
+        )
 
         // load alert groups, create lookup map
         mAlertGroups = getAlertGroups(context!!)
@@ -74,6 +76,9 @@ class SelectorEditFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
+
+        // update the action bar title
+        activity?.setTitle(R.string.title_selector_edit)
 
         // populate existing data (or blank template if creating a new alert group)
         populateFields(mNs)
@@ -95,7 +100,7 @@ class SelectorEditFragment : Fragment() {
         selector_edit_package_name.setAdapter(packageNameAdapter)
 
         // add textWatchers
-        registerTextWatchers()
+        registerWatchers()
     }
 
     override fun onDetach() {
@@ -112,7 +117,7 @@ class SelectorEditFragment : Fragment() {
         // handle item selection
         return when (item.itemId) {
             R.id.action_selector_edit_cancel_edit -> cancelEdit()
-            R.id.action_selector_edit_delete -> deleteSelector()
+            R.id.action_selector_edit_delete -> deleteNotificationSelector()
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -121,13 +126,17 @@ class SelectorEditFragment : Fragment() {
         fun onFragmentInteraction(type: String, data: Any)
     }
 
-    private fun EditText.saveAfterTextChanged(afterTextChanged: (String) -> Unit) {
+    private fun EditText.saveAfterTextChanged(updateNsField: (String) -> Unit) {
         this.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+            // auto-save when user types in the text fields
             override fun afterTextChanged(editable: Editable?) {
-                if (mTextWatchersEnabled) {
-                    afterTextChanged.invoke(editable.toString())
+                if (mAutoSaveEnabled) {
+                    // call function passed in by user, e.g. { mNs.name = it }
+                    updateNsField.invoke(editable.toString())
+
+                    // update & save notification selector
                     mNotificationSelectors[mNsId] = mNs
                     saveNotificationSelectors(context!!, mNotificationSelectors)
                 }
@@ -135,7 +144,8 @@ class SelectorEditFragment : Fragment() {
         })
     }
 
-    private fun registerTextWatchers() {
+    private fun registerWatchers() {
+        // auto-save when user types in the text fields
         selector_edit_name.saveAfterTextChanged { mNs.name = it }
         selector_edit_comment.saveAfterTextChanged { mNs.comment = it }
         selector_edit_alert_group.saveAfterTextChanged { mNs.alertGroupId = mAlertGroupsNameLookup[it] }
@@ -148,7 +158,8 @@ class SelectorEditFragment : Fragment() {
     }
 
     private fun populateFields(ns: NotificationSelector) {
-        mTextWatchersEnabled = false
+        // load existing stored data into the text fields
+        mAutoSaveEnabled = false
         selector_edit_name.setText(ns.name)
         selector_edit_comment.setText(ns.comment)
         selector_edit_alert_group.setText(mAlertGroups[ns.alertGroupId]?.name)
@@ -156,21 +167,29 @@ class SelectorEditFragment : Fragment() {
         selector_edit_match_title.setText(ns.matchTitle)
         selector_edit_match_text.setText(ns.matchText)
         selector_edit_min_secs_between_alerts.setText(ns.minSecsBetweenAlerts.toString())
-        mTextWatchersEnabled = true
+        mAutoSaveEnabled = true
     }
 
     private fun cancelEdit(): Boolean {
+        // load notification selector backup
         populateFields(mNsBackup)
-        mNs =
-            Json.parse(NotificationSelector.serializer(), Json.stringify(NotificationSelector.serializer(), mNsBackup))
+        mNs = Json.parse(
+            NotificationSelector.serializer(),
+            Json.stringify(NotificationSelector.serializer(), mNsBackup)
+        )
+
+        // save the reverted notification selector
         mNotificationSelectors[mNsId] = mNs
         saveNotificationSelectors(context!!, mNotificationSelectors)
         return true
     }
 
-    private fun deleteSelector(): Boolean {
+    private fun deleteNotificationSelector(): Boolean {
+        // delete notification selector from list & then save
         mNotificationSelectors.remove(mNsId)
         saveNotificationSelectors(context!!, mNotificationSelectors)
+
+        // leave edit fragment
         activity!!.onBackPressed()
         return true
     }

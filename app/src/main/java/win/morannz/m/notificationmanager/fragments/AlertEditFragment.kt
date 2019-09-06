@@ -23,11 +23,11 @@ class AlertEditFragment : Fragment() {
     private var mAgBackup = AlertGroup()
     private var mListener: OnFragmentInteractionListener? = null
     private var mAlertGroups = mutableMapOf<Int, AlertGroup>()
-    private var mTextWatchersEnabled = true
+    private var mAutoSaveEnabled = true
     private var mRelativeVolumeStreams = mapOf<String, Int>()
 
     companion object {
-        private val TAG = this::class.java.simpleName
+        private val TAG = AlertEditFragment::class.java.simpleName
         private const val ALERT_GROUP_ID = "alertGroupId"
 
         fun newInstance(alertGroupId: Int) = AlertEditFragment().apply {
@@ -83,6 +83,9 @@ class AlertEditFragment : Fragment() {
     override fun onStart() {
         super.onStart()
 
+        // update the action bar title
+        activity?.setTitle(R.string.title_alert_edit)
+
         // populate existing data (or blank template if creating a new alert group)
         populateFields(mAg)
 
@@ -112,7 +115,7 @@ class AlertEditFragment : Fragment() {
         // handle item selection
         return when (item.itemId) {
             R.id.action_alert_edit_cancel_edit -> cancelEdit()
-            R.id.action_alert_edit_delete -> deleteSelector()
+            R.id.action_alert_edit_delete -> deleteAlertGroup()
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -127,21 +130,24 @@ class AlertEditFragment : Fragment() {
         this.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+            // auto-save when user types in the text fields
             override fun afterTextChanged(editable: Editable?) {
-                applyChanges { afterTextChanged(editable.toString()) }
+                autoSave { afterTextChanged(editable.toString()) }
             }
         })
     }
 
-    private fun applyChanges(applyChange: () -> Unit) {
-        if (mTextWatchersEnabled) {
-            applyChange()
+    private fun autoSave(updateAgField: () -> Unit) {
+        // auto-save when user interacts with an input
+        if (mAutoSaveEnabled) {
+            updateAgField()
             mAlertGroups[mAgId] = mAg
             saveAlertGroups(context!!, mAlertGroups)
         }
     }
 
     private fun getRelativeVolumeStreamString(stream: Int): String {
+        // get the name of the volume stream from it'd Android integer ID
         for ((k, v) in mRelativeVolumeStreams) {
             if (v == stream) {
                 return k
@@ -151,32 +157,35 @@ class AlertEditFragment : Fragment() {
     }
 
     private fun registerWatchers() {
+        // auto-save when user types in the input fields
         alert_edit_name.afterTextChanged { mAg.name = it }
         alert_edit_comment.afterTextChanged { mAg.comment = it }
         alert_edit_min_secs_between_alerts.afterTextChanged { if (it != "") mAg.minSecsBetweenAlerts = it.toInt() }
         alert_edit_sound_uri.setOnClickListener { selectSoundUri() }
         alert_edit_vibration_pattern.afterTextChanged { mAg.vibrationPatternTimings = it }
         alert_edit_alert_when_screen_on.setOnCheckedChangeListener { _, isChecked ->
-            applyChanges { mAg.alertWhenScreenOn = isChecked }
+            autoSave { mAg.alertWhenScreenOn = isChecked }
         }
         alert_edit_absolute_volume.setOnCheckedChangeListener { _, isChecked ->
-            applyChanges { mAg.absoluteVolume = isChecked }
+            autoSave { mAg.absoluteVolume = isChecked }
         }
         alert_edit_volume_percent.afterTextChanged { if (it != "") mAg.volumePercent = it.toInt() }
         alert_edit_sound_ringer_modes_group.addOnButtonCheckedListener { _, _, _ ->
-            applyChanges {
-                mAg.vibrationRingerModes = (0
-                        + alert_edit_sound_ringer_mode_silent.isChecked.toInt() * RingerMode.SILENT
-                        + alert_edit_sound_ringer_mode_vibrate.isChecked.toInt() * RingerMode.VIBRATE
-                        + alert_edit_sound_ringer_mode_normal.isChecked.toInt() * RingerMode.NORMAL)
+            autoSave {
+                // 3 bits stored as a single int
+                mAg.soundRingerModes = (0
+                    + alert_edit_sound_ringer_mode_silent.isChecked.toInt() * RingerMode.SILENT
+                    + alert_edit_sound_ringer_mode_vibrate.isChecked.toInt() * RingerMode.VIBRATE
+                    + alert_edit_sound_ringer_mode_normal.isChecked.toInt() * RingerMode.NORMAL)
             }
         }
         alert_edit_vibration_ringer_modes_group.addOnButtonCheckedListener { _, _, _ ->
-            applyChanges {
+            autoSave {
+                // 3 bits stored as a single int
                 mAg.vibrationRingerModes = (0
-                        + alert_edit_vibration_ringer_mode_silent.isChecked.toInt() * RingerMode.SILENT
-                        + alert_edit_vibration_ringer_mode_vibrate.isChecked.toInt() * RingerMode.VIBRATE
-                        + alert_edit_vibration_ringer_mode_normal.isChecked.toInt() * RingerMode.NORMAL)
+                    + alert_edit_vibration_ringer_mode_silent.isChecked.toInt() * RingerMode.SILENT
+                    + alert_edit_vibration_ringer_mode_vibrate.isChecked.toInt() * RingerMode.VIBRATE
+                    + alert_edit_vibration_ringer_mode_normal.isChecked.toInt() * RingerMode.NORMAL)
             }
         }
         alert_edit_relative_volume_stream.afterTextChanged {
@@ -185,7 +194,8 @@ class AlertEditFragment : Fragment() {
     }
 
     private fun populateFields(ag: AlertGroup) {
-        mTextWatchersEnabled = false
+        // load existing stored data into the text fields
+        mAutoSaveEnabled = false
         alert_edit_name.setText(ag.name)
         alert_edit_comment.setText(ag.comment)
         alert_edit_min_secs_between_alerts.setText(ag.minSecsBetweenAlerts.toString())
@@ -201,10 +211,11 @@ class AlertEditFragment : Fragment() {
         alert_edit_vibration_ringer_mode_vibrate.isChecked = (ag.vibrationRingerModes and RingerMode.VIBRATE) != 0
         alert_edit_vibration_ringer_mode_normal.isChecked = (ag.vibrationRingerModes and RingerMode.NORMAL) != 0
         alert_edit_relative_volume_stream.setText(getRelativeVolumeStreamString(ag.relativeVolumeStream))
-        mTextWatchersEnabled = true
+        mAutoSaveEnabled = true
     }
 
     private fun selectSoundUri() {
+        // use RingtoneManager to select a notification tone
         val i = Intent(RingtoneManager.ACTION_RINGTONE_PICKER)
             //.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select ringtone for notifications:")
             .putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, true)
@@ -214,31 +225,42 @@ class AlertEditFragment : Fragment() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        // recieving selected notification tone
         if (requestCode == RequestCode.SOUND_URI) {
+            // user selected a ringtone successfully
             if (resultCode == Activity.RESULT_OK) {
+                // load ringtone from intent
                 val uri: Uri? = data?.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
                 mAg.soundUri = uri?.toString()
+
+                // display selected ringtone to user & save change
                 alert_edit_sound_uri.setText(mAg.soundUri)
                 mAlertGroups[mAgId] = mAg
                 saveAlertGroups(context!!, mAlertGroups)
             }
             if (resultCode == Activity.RESULT_CANCELED) {
-                //Write your code if there's no result
+                // there's no result
             }
         }
     }
 
     private fun cancelEdit(): Boolean {
+        // load alert group backup
         populateFields(mAgBackup)
         mAg = Json.parse(AlertGroup.serializer(), Json.stringify(AlertGroup.serializer(), mAgBackup))
+
+        // save the reverted alert group
         mAlertGroups[mAgId] = mAg
         saveAlertGroups(context!!, mAlertGroups)
         return true
     }
 
-    private fun deleteSelector(): Boolean {
+    private fun deleteAlertGroup(): Boolean {
+        // delete alert group from list & then save
         mAlertGroups.remove(mAgId)
         saveAlertGroups(context!!, mAlertGroups)
+
+        // leave edit fragment
         activity!!.onBackPressed()
         return true
     }

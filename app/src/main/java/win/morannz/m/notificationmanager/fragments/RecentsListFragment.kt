@@ -16,7 +16,7 @@ import win.morannz.m.notificationmanager.getRecentNotifications
 
 class RecentsListFragment : Fragment() {
     companion object {
-        private val TAG = this::class.java.simpleName
+        private val TAG = RecentsListFragment::class.java.simpleName
     }
 
     private var mListener: OnListFragmentInteractionListener? = null
@@ -60,8 +60,13 @@ class RecentsListFragment : Fragment() {
     }
 
     fun updateList(rn: RecentNotification) {
+        // insert recent notification at the start of the list
         mRecentNotifications.add(0, rn)
+
+        // trim list length
         mRecentNotifications = mRecentNotifications.take(C.MAX_NUMBER_OF_RECENT_NOTIFICATIONS).toMutableList()
+
+        // refresh list
         mListAdapter?.notifyDataSetChanged()
     }
 }

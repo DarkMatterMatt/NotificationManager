@@ -14,7 +14,7 @@ import win.morannz.m.notificationmanager.getNotificationSelectorNewIndex
 class SelectorsFragment : Fragment() {
     companion object {
         fun newInstance() = SelectorsFragment()
-        private val TAG = this::class.java.simpleName
+        private val TAG = SelectorsFragment::class.java.simpleName
 
         private const val ME = "${BuildConfig.APPLICATION_ID}.SelectorsFragment"
         const val INTERACTION = "$ME.INTERACTION"
@@ -41,6 +41,11 @@ class SelectorsFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
+
+        // update the action bar title
+        activity?.setTitle(R.string.title_selectors)
+
+        // 'new alert group' button
         btn_add_selector.setOnClickListener {
             val newIndex = getNotificationSelectorNewIndex(context!!)
             mListener?.onFragmentInteraction(INTERACTION, newIndex)

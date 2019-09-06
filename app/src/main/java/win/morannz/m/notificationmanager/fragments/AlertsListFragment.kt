@@ -14,7 +14,7 @@ import win.morannz.m.notificationmanager.getAlertGroups
 
 class AlertsListFragment : Fragment() {
     companion object {
-        private val TAG = this::class.java.simpleName
+        private val TAG = AlertsListFragment::class.java.simpleName
     }
 
     private var mListener: OnListFragmentInteractionListener? = null

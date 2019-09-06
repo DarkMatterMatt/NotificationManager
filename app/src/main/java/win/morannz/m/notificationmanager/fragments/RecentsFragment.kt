@@ -14,7 +14,7 @@ class RecentsFragment : Fragment() {
 
     companion object {
         fun newInstance() = RecentsFragment()
-        private val TAG = this::class.java.simpleName
+        private val TAG = RecentsFragment::class.java.simpleName
 
         private const val ME = "${BuildConfig.APPLICATION_ID}.RecentsFragment"
         const val INTENT_UPDATE = "$ME.INTENT_UPDATE"
@@ -37,6 +37,13 @@ class RecentsFragment : Fragment() {
     ): View? {
         // inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_recents, container, false)
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        // update the action bar title
+        activity?.setTitle(R.string.title_recents)
     }
 
     override fun onDetach() {

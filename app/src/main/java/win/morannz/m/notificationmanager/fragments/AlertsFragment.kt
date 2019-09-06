@@ -14,7 +14,7 @@ import win.morannz.m.notificationmanager.getAlertGroupNewIndex
 class AlertsFragment : Fragment() {
     companion object {
         fun newInstance() = AlertsFragment()
-        private val TAG = this::class.java.simpleName
+        private val TAG = AlertsFragment::class.java.simpleName
 
         private const val ME = "${BuildConfig.APPLICATION_ID}.AlertsFragment"
         const val INTERACTION = "$ME.INTERACTION"
@@ -41,6 +41,11 @@ class AlertsFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
+
+        // update the action bar title
+        activity?.setTitle(R.string.title_alerts)
+
+        // 'new alert group' button
         btn_add_alert.setOnClickListener {
             val newIndex = getAlertGroupNewIndex(context!!)
             mListener?.onFragmentInteraction(INTERACTION, newIndex)

@@ -14,7 +14,7 @@ import win.morannz.m.notificationmanager.getNotificationSelectors
 
 class SelectorsListFragment : Fragment() {
     companion object {
-        private val TAG = this::class.java.simpleName
+        private val TAG = SelectorsListFragment::class.java.simpleName
     }
 
     private var mListener: OnListFragmentInteractionListener? = null
