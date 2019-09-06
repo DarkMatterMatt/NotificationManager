@@ -27,8 +27,9 @@ class MainActivity : AppCompatActivity(),
     AlertsListFragment.OnListFragmentInteractionListener,
     AlertEditFragment.OnFragmentInteractionListener,
     RecentsFragment.OnFragmentInteractionListener,
-    RecentsListFragment.OnListFragmentInteractionListener {
-    //RecentViewFragment.OnFragmentInteractionListener {
+    RecentsListFragment.OnListFragmentInteractionListener,
+    //RecentViewFragment.OnFragmentInteractionListener,
+    VibrationEditFragment.OnFragmentInteractionListener {
     companion object {
         private val TAG = this::class.java.simpleName
     }
