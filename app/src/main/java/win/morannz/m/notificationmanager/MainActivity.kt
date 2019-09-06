@@ -11,6 +11,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -31,7 +32,8 @@ class MainActivity : AppCompatActivity(),
     //RecentViewFragment.OnFragmentInteractionListener,
     VibrationEditFragment.OnFragmentInteractionListener {
     companion object {
-        private val TAG = this::class.java.simpleName
+        private val TAG = MainActivity::class.java.simpleName
+        private val BACK_STACK_ROOT_TAG = "root_fragment"
     }
 
     private lateinit var mLocalBroadcastManager: LocalBroadcastManager
@@ -107,12 +109,16 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onBackPressed() {
-        if (mCurrentFragment is AlertEditFragment) {
-            navigate(AlertsFragment.newInstance(), R.string.title_alerts)
-        } else if (mCurrentFragment is SelectorEditFragment) {
-            navigate(SelectorsFragment.newInstance(), R.string.title_selectors)
-        } else {
-            super.onBackPressed()
+        // go back only if there is something to go back to
+        if (supportFragmentManager.backStackEntryCount > 1) {
+            super.onBackPressed();
+        }
+        // otherwise go to home screen
+        else {
+            val intent = Intent(Intent.ACTION_MAIN)
+            intent.addCategory(Intent.CATEGORY_HOME)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(intent)
         }
     }
 
@@ -138,10 +144,26 @@ class MainActivity : AppCompatActivity(),
         // save the new fragment
         mCurrentFragment = destFragment
 
+        // create fragment transaction
+        val fragmentManager = supportFragmentManager;
+        val transaction = fragmentManager.beginTransaction()
+
+        // clear the back stack if navigating to a new tab
+        if (destFragment is RecentsFragment || destFragment is SelectorsFragment || destFragment is AlertsFragment) {
+            supportFragmentManager.popBackStack(
+                BACK_STACK_ROOT_TAG,
+                FragmentManager.POP_BACK_STACK_INCLUSIVE
+            )
+            transaction.addToBackStack(BACK_STACK_ROOT_TAG)
+        }
+        // add new fragment to back stack on top of old ones
+        else {
+            transaction.addToBackStack(null)
+        }
+
         // perform fragment swap
-        val t = supportFragmentManager.beginTransaction()
-        t.replace(R.id.fragment, destFragment, destFragment::class.java.canonicalName)
-        t.commit()
+        transaction.replace(R.id.fragment, destFragment, destFragment::class.java.canonicalName)
+        transaction.commit()
 
         // change the title
         if (destTitle !== null) setTitle(destTitle)
