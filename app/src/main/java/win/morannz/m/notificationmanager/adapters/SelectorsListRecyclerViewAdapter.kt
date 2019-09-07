@@ -23,7 +23,7 @@ class SelectorsListRecyclerViewAdapter(
 
     init {
         mOnClickListener = View.OnClickListener { v ->
-            mListener?.onListFragmentInteraction(SelectorsFragment.INTERACTION, v.tag)
+            mListener?.onListFragmentInteraction(SelectorsFragment.NAVIGATE_SELECTOR_EDIT, v.tag)
         }
     }
 

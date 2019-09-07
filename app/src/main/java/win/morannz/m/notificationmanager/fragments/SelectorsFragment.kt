@@ -17,7 +17,7 @@ class SelectorsFragment : Fragment() {
         private val TAG = SelectorsFragment::class.java.simpleName
 
         private const val ME = "${BuildConfig.APPLICATION_ID}.SelectorsFragment"
-        const val INTERACTION = "$ME.INTERACTION"
+        const val NAVIGATE_SELECTOR_EDIT = "$ME.NAVIGATE_ALERT_EDIT"
     }
 
     private var mListener: OnFragmentInteractionListener? = null
@@ -48,7 +48,7 @@ class SelectorsFragment : Fragment() {
         // 'new alert group' button
         btn_add_selector.setOnClickListener {
             val newIndex = getNotificationSelectorNewIndex(context!!)
-            mListener?.onFragmentInteraction(INTERACTION, newIndex)
+            mListener?.onFragmentInteraction(NAVIGATE_SELECTOR_EDIT, newIndex)
         }
     }
 

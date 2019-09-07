@@ -23,7 +23,7 @@ class AlertsListRecyclerViewAdapter(
 
     init {
         mOnClickListener = View.OnClickListener { v ->
-            mListener?.onListFragmentInteraction(AlertsFragment.INTERACTION, v.tag)
+            mListener?.onListFragmentInteraction(AlertsFragment.NAVIGATE_ALERT_EDIT, v.tag)
         }
     }
 

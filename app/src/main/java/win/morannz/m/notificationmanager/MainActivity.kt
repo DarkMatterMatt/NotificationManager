@@ -136,12 +136,16 @@ class MainActivity : AppCompatActivity(),
 
     override fun onFragmentInteraction(type: String, data: Any) {
         when (type) {
-            SelectorsFragment.INTERACTION -> {
+            SelectorsFragment.NAVIGATE_SELECTOR_EDIT -> {
                 val destFragment = SelectorEditFragment.newInstance(data as Int)
                 navigate(destFragment)
             }
-            AlertsFragment.INTERACTION -> {
+            AlertsFragment.NAVIGATE_ALERT_EDIT -> {
                 val destFragment = AlertEditFragment.newInstance(data as Int)
+                navigate(destFragment)
+            }
+            AlertEditFragment.NAVIGATE_VIBRATION_EDIT -> {
+                val destFragment = VibrationEditFragment.newInstance(data as Int)
                 navigate(destFragment)
             }
         }

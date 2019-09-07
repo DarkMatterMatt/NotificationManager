@@ -17,7 +17,7 @@ class AlertsFragment : Fragment() {
         private val TAG = AlertsFragment::class.java.simpleName
 
         private const val ME = "${BuildConfig.APPLICATION_ID}.AlertsFragment"
-        const val INTERACTION = "$ME.INTERACTION"
+        const val NAVIGATE_ALERT_EDIT = "$ME.NAVIGATE_ALERT_EDIT"
     }
 
     private var mListener: OnFragmentInteractionListener? = null
@@ -48,7 +48,7 @@ class AlertsFragment : Fragment() {
         // 'new alert group' button
         btn_add_alert.setOnClickListener {
             val newIndex = getAlertGroupNewIndex(context!!)
-            mListener?.onFragmentInteraction(INTERACTION, newIndex)
+            mListener?.onFragmentInteraction(NAVIGATE_ALERT_EDIT, newIndex)
         }
     }
 
