@@ -19,7 +19,7 @@ class RecentsFragment : Fragment() {
         private const val ME = "${BuildConfig.APPLICATION_ID}.RecentsFragment"
         const val INTENT_UPDATE = "$ME.INTENT_UPDATE"
         const val UPDATE_DATA = "$ME.UPDATE_DATA"
-        const val INTERACTION = "$ME.INTERACTION"
+        const val INTERACTION = "$ME.NAVIGATE_ALERT_EDIT"
     }
 
     override fun onAttach(context: Context) {

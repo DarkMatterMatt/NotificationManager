@@ -3,17 +3,37 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/frameLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.VibrationEditFragment">
+    android:layout_margin="0dp"
+    tools:context=".fragments.VibrationEditFragment"
+    android:padding="16dp">
 
-    <SeekBar
-        android:id="@+id/seekBar"
-        android:layout_width="wrap_content"
-        android:layout_height="300dp"
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:rotation="270" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.db.williamchart.view.LineChartView
+            android:id="@+id/line_chart"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            app:chart_lineColor="#ff0000"
+            app:chart_lineThickness="3dp"
+            app:chart_axis="none"
+            app:chart_smoothLine="true"/>
+
+        <android.widget.VerticalSeekBar
+            android:id="@+id/seekBar"
+            android:layout_width="wrap_content"
+            android:layout_height="300dp"
+            android:gravity="end"
+            android:max="255" />
+    </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -3,7 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -81,6 +82,15 @@
                 android:inputType="text"
                 android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
+
+        <com.db.williamchart.view.LineChartView
+            android:id="@+id/line_chart"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            app:chart_lineColor="#ffffff"
+            app:chart_lineThickness="3dp"
+            app:chart_smoothLine="true"
+            app:chart_axis="none"/>
 
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/alert_edit_alert_when_screen_on"

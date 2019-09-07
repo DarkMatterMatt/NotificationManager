@@ -10,6 +10,7 @@
     <string name="title_alerts">Alert Groups</string>
     <string name="title_alert_edit">Edit Group</string>
     <string name="title_notification_manager">Notification Manager</string>
+    <string name="title_vibration_edit">Edit Vibration Pattern</string>
 
     <!-- Settings -->
     <string name="action_settings">Settings</string>
@@ -57,7 +58,4 @@
     <string name="alert_edit_relative_volume_stream_notification">Notification</string>
     <string name="alert_edit_relative_volume_stream_alarm">Alarm</string>
     <string name="alert_edit_relative_volume_stream_music">Music</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

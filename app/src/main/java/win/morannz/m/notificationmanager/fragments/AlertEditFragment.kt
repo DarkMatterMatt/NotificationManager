@@ -3,6 +3,7 @@ package win.morannz.m.notificationmanager.fragments
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.media.AudioManager
 import android.media.RingtoneManager
 import android.net.Uri
@@ -17,6 +18,7 @@ import kotlinx.android.synthetic.main.fragment_alert_edit.*
 import kotlinx.serialization.json.Json
 import win.morannz.m.notificationmanager.*
 
+
 class AlertEditFragment : Fragment() {
     private var mAgId = -1
     private var mAg = AlertGroup()
@@ -29,6 +31,7 @@ class AlertEditFragment : Fragment() {
     companion object {
         private val TAG = AlertEditFragment::class.java.simpleName
         private const val ALERT_GROUP_ID = "alertGroupId"
+        const val NAVIGATE_VIBRATION_EDIT = "NAVIGATE_VIBRATION_EDIT"
 
         fun newInstance(alertGroupId: Int) = AlertEditFragment().apply {
             arguments = Bundle().apply {
@@ -97,8 +100,9 @@ class AlertEditFragment : Fragment() {
         )
         alert_edit_relative_volume_stream.setAdapter(relativeVolumeStreamAdapter)
 
-        // add textWatchers
+        // add textWatchers & load the vibration pattern graph
         registerWatchers()
+        loadVibrationChart()
     }
 
     override fun onDetach() {
@@ -157,6 +161,11 @@ class AlertEditFragment : Fragment() {
     }
 
     private fun registerWatchers() {
+        // open vibration pattern editor when graph is clicked on
+        line_chart.setOnClickListener {
+            mListener?.onFragmentInteraction(NAVIGATE_VIBRATION_EDIT, mAgId)
+        }
+
         // auto-save when user types in the input fields
         alert_edit_name.afterTextChanged { mAg.name = it }
         alert_edit_comment.afterTextChanged { mAg.comment = it }
@@ -263,5 +272,23 @@ class AlertEditFragment : Fragment() {
         // leave edit fragment
         activity!!.onBackPressed()
         return true
+    }
+
+    private fun loadVibrationChart() {
+        val points = listOf(
+            5f, 4.5f, 4.7f, 3.5f, 3.6f, 7.5f, 7.5f, 10f, 5f, 6.5f, 3f, 4f
+        )
+
+        val lineSet = linkedMapOf<String, Float>()
+        points.forEachIndexed { i, element ->
+            lineSet[i.toString()] = element
+        }
+
+        line_chart.gradientFillColors = intArrayOf(
+            Color.BLUE,
+            Color.RED
+        )
+        line_chart.animation.duration = 1000
+        line_chart.animate(lineSet)
     }
 }

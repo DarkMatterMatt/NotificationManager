@@ -6,12 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.db.williamchart.data.Scale
+import kotlinx.android.synthetic.main.fragment_vibration_edit.*
+import win.morannz.m.notificationmanager.AlertGroup
+import win.morannz.m.notificationmanager.BuildConfig
 import win.morannz.m.notificationmanager.R
+import win.morannz.m.notificationmanager.getAlertGroups
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
 /**
  * A simple [Fragment] subclass.
@@ -22,17 +23,40 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  */
 class VibrationEditFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-    private var listener: OnFragmentInteractionListener? = null
+    private var mAgId = -1
+    private var mAg = AlertGroup()
+    private var mListener: OnFragmentInteractionListener? = null
+    private var mAlertGroups = mutableMapOf<Int, AlertGroup>()
+
+    companion object {
+        private val TAG = VibrationEditFragment::class.java.simpleName
+        private const val ALERT_GROUP_ID = "alertGroupId"
+
+        private const val ME = "${BuildConfig.APPLICATION_ID}.VibrationEditFragment"
+
+        fun newInstance(alertGroupId: Int) = VibrationEditFragment().apply {
+            arguments = Bundle().apply {
+                putInt(ALERT_GROUP_ID, alertGroupId)
+            }
+        }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is OnFragmentInteractionListener) {
+            mListener = context
+        } else {
+            throw RuntimeException("$context must implement OnFragmentInteractionListener")
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
+        mAgId = arguments!!.getInt(ALERT_GROUP_ID)
+        mAlertGroups = getAlertGroups(context!!).toMutableMap()
+        mAg = mAlertGroups[mAgId] ?: AlertGroup()
+
+        //setHasOptionsMenu(true)
     }
 
     override fun onCreateView(
@@ -43,52 +67,39 @@ class VibrationEditFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_vibration_edit, container, false)
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        if (context is OnFragmentInteractionListener) {
-            listener = context
-        } else {
-            throw RuntimeException(context.toString() + " must implement OnFragmentInteractionListener")
-        }
+    override fun onStart() {
+        super.onStart()
+
+        // update the action bar title
+        activity?.setTitle(R.string.title_vibration_edit)
+
+        loadVibrationChart()
     }
 
     override fun onDetach() {
         super.onDetach()
-        listener = null
+        mListener = null
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     *
-     *
-     * See the Android Training lesson [Communicating with Other Fragments]
-     * (http://developer.android.com/training/basics/fragments/communicating.html)
-     * for more information.
-     */
     interface OnFragmentInteractionListener {
         fun onFragmentInteraction(type: String, data: Any)
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment VibrationEditFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            VibrationEditFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+    private fun loadVibrationChart() {
+        val amplitudesString = mAg.vibrationPatternAmplitudes ?: "0,50,250,100,30"
+        val amplitudes = amplitudesString.split(",").map { it.toInt() }
+
+        val lineSet = linkedMapOf<String, Float>()
+        amplitudes.forEachIndexed { i, element ->
+            lineSet[(i / 10f).toString()] = element.toFloat()
+        }
+
+        /*line_chart.gradientFillColors = intArrayOf(
+            Color.YELLOW,
+            Color.GREEN
+        )*/
+        line_chart.scale = Scale(0f, 255f)
+        line_chart.animation.duration = 1000
+        line_chart.animate(lineSet)
     }
 }
