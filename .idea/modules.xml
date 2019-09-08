@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/NotificationManager.iml" filepath="$PROJECT_DIR$/NotificationManager.iml" />
-      <module fileurl="file://$PROJECT_DIR$/williamchart/NotificationManager-williamchart.iml" filepath="$PROJECT_DIR$/williamchart/NotificationManager-williamchart.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/williamchart/williamchart.iml" filepath="$PROJECT_DIR$/williamchart/williamchart.iml" />
     </modules>

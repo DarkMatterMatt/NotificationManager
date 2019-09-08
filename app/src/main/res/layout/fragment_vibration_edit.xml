@@ -28,7 +28,7 @@
             app:chart_smoothLine="true"/>
 
         <android.widget.VerticalSeekBar
-            android:id="@+id/seekBar"
+            android:id="@+id/seek_bar"
             android:layout_width="wrap_content"
             android:layout_height="300dp"
             android:gravity="end"

@@ -2,9 +2,12 @@ package win.morannz.m.notificationmanager.fragments
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SeekBar
+import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.fragment.app.Fragment
 import com.db.williamchart.data.Scale
 import kotlinx.android.synthetic.main.fragment_vibration_edit.*
@@ -27,6 +30,7 @@ class VibrationEditFragment : Fragment() {
     private var mAg = AlertGroup()
     private var mListener: OnFragmentInteractionListener? = null
     private var mAlertGroups = mutableMapOf<Int, AlertGroup>()
+    private var mLineSet = linkedMapOf<String, Float>()
 
     companion object {
         private val TAG = VibrationEditFragment::class.java.simpleName
@@ -73,6 +77,7 @@ class VibrationEditFragment : Fragment() {
         // update the action bar title
         activity?.setTitle(R.string.title_vibration_edit)
 
+        addSeekBarListeners()
         loadVibrationChart()
     }
 
@@ -85,21 +90,34 @@ class VibrationEditFragment : Fragment() {
         fun onFragmentInteraction(type: String, data: Any)
     }
 
+    private fun addSeekBarListeners() {
+        seek_bar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+            override fun onStartTrackingTouch(seekBar: SeekBar) {
+                // TODO: reset mLineSet
+                //mLineSet = linkedMapOf("0" to 0F)
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
+
+            }
+
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                // TODO: append progress to mLineSet, render chart
+                Log.d(TAG, "seek_bar progress: $progress")
+            }
+        })
+    }
+
     private fun loadVibrationChart() {
         val amplitudesString = mAg.vibrationPatternAmplitudes ?: "0,50,250,100,30"
         val amplitudes = amplitudesString.split(",").map { it.toInt() }
 
-        val lineSet = linkedMapOf<String, Float>()
         amplitudes.forEachIndexed { i, element ->
-            lineSet[(i / 10f).toString()] = element.toFloat()
+            mLineSet[i.toString()] = element.toFloat()
         }
 
-        /*line_chart.gradientFillColors = intArrayOf(
-            Color.YELLOW,
-            Color.GREEN
-        )*/
-        line_chart.scale = Scale(0f, 255f)
+        line_chart.scale = Scale(0F, 255F)
         line_chart.animation.duration = 1000
-        line_chart.animate(lineSet)
+        line_chart.animate(mLineSet)
     }
 }
