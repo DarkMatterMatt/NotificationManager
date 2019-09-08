@@ -8,6 +8,8 @@ import androidx.appcompat.widget.AppCompatSeekBar;
 
 public class VerticalSeekBar extends AppCompatSeekBar {
 
+    private OnSeekBarChangeListener mListener;
+
     public VerticalSeekBar(Context context) {
         super(context);
     }
@@ -30,6 +32,11 @@ public class VerticalSeekBar extends AppCompatSeekBar {
         setMeasuredDimension(getMeasuredHeight(), getMeasuredWidth());
     }
 
+    @Override
+    public void setOnSeekBarChangeListener(OnSeekBarChangeListener listener){
+        this.mListener = listener;
+    }
+
     protected void onDraw(Canvas c) {
         c.rotate(-90);
         c.translate(-getHeight(), 0);
@@ -45,10 +52,24 @@ public class VerticalSeekBar extends AppCompatSeekBar {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                if (mListener != null) {
+                    mListener.onStartTrackingTouch(this);
+                }
+                break;
+
             case MotionEvent.ACTION_MOVE:
-            case MotionEvent.ACTION_UP:
-                setProgress(getMax() - (int) (getMax() * event.getY() / getHeight()));
+                int progress = getMax() - (int) (getMax() * event.getY() / getHeight());
+                setProgress(progress);
                 onSizeChanged(getWidth(), getHeight(), 0, 0);
+                if (mListener != null) {
+                    mListener.onProgressChanged(this, progress, true);
+                }
+                break;
+
+            case MotionEvent.ACTION_UP:
+                if (mListener != null) {
+                    mListener.onStopTrackingTouch(this);
+                }
                 break;
 
             case MotionEvent.ACTION_CANCEL:
