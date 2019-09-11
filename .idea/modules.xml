@@ -4,7 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/NotificationManager.iml" filepath="$PROJECT_DIR$/NotificationManager.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/williamchart/williamchart.iml" filepath="$PROJECT_DIR$/williamchart/williamchart.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../WilliamChart/williamchart/WilliamChart-williamchart.iml" filepath="$PROJECT_DIR$/../WilliamChart/williamchart/WilliamChart-williamchart.iml" />
     </modules>
   </component>
 </project>

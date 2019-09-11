@@ -1,1 +1,2 @@
 include ':app', ':williamchart'
+project (':williamchart').projectDir = new File('../WilliamChart/williamchart')
