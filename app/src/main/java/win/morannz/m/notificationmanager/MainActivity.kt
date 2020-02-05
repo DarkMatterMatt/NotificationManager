@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity(),
     private val mBroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == RecentsFragment.INTENT_UPDATE) {
-                val rnString = intent.getStringExtra(RecentsFragment.UPDATE_DATA)
+                val rnString = intent.getStringExtra(RecentsFragment.UPDATE_DATA) ?: return
                 val rn = Json.parse(RecentNotification.serializer(), rnString)
                 val fragment = mCurrentFragment
                 if (fragment is RecentsFragment) {
@@ -92,7 +92,8 @@ class MainActivity : AppCompatActivity(),
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
 
         // load default fragment (Recents view)
-        navigate(RecentsFragment.newInstance())
+        //navigate(RecentsFragment.newInstance())
+        navigate(VibrationEditFragment.newInstance(1))
 
         // prompt user to enable the notification listener service
         if (!isNotificationServiceEnabled()) {

@@ -25,14 +25,14 @@
             app:chart_lineColor="#ff0000"
             app:chart_lineThickness="3dp"
             app:chart_axis="none"
-            app:chart_smoothLine="true"/>
+            app:chart_showPoints="true" />
 
         <android.widget.VerticalSeekBar
             android:id="@+id/seek_bar"
             android:layout_width="wrap_content"
             android:layout_height="300dp"
             android:gravity="end"
-            android:max="255" />
+            android:max="31" />
     </LinearLayout>
 
 
